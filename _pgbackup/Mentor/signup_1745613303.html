@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <title>Starter Page - Mentor Bootstrap Template</title>
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        <!-- Favicons -->
+        <link href="assets/img/favicon.png" rel="icon">
+        <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com" rel="preconnect">
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <!-- Vendor CSS Files -->
+        <link href="../bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+        <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+        <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+        <!-- Main CSS File -->
+        <link href="assets/css/main.css" rel="stylesheet">
+        <!-- =======================================================
+  * Template Name: Mentor
+  * Template URL: https://bootstrapmade.com/mentor-free-education-bootstrap-theme/
+  * Updated: Aug 07 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+    </head>
+    <body class="starter-page-page">
+        <header id="header" class="header d-flex align-items-center sticky-top">
+</header>
+        <main class="main">
+            <!-- End Page Title -->
+            <!-- Starter Section Section -->
+            <section id="starter-section" class="starter-section section">
+                <!-- Section Title 
+                <div class="container section-title" data-aos="fade-up">
+                    <h2>Sign In</h2>
+                </div> -->
+                <!-- End Section Title -->
+                <div class="container" data-aos="fade-up">
+                    <div class="row justify-content-center auth-box">
+                        <!-- Left Panel -->
+                        <div class="col-md-6 d-none d-md-flex auth-left align-items-center justify-content-center">
+                            <div>
+                                <img src="assets/img/logo.png" alt="FZIS Logo">
+                                <h3>Register at FZIS</h3>
+                                <p class="text-muted">Join our learning community</p>
+                            </div>
+                        </div>
+                        <!-- Right Panel (Form) -->
+                        <div class="col-md-6 auth-form">
+                            <h3>Create Your FZIS Account</h3>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" class="form-control" placeholder="Enter your password">
+                            </div>
+                            <button id="signInBtn" class="btn btn-success w-100">Sign In</button>
+                            <p id="status" class="text-danger mt-3"></p>
+                            <p class="mt-4 text-center">Already have an account? <a href="signin.html" class="text-success text-decoration-none fw-semibold">Sign In</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /Starter Section Section -->
+        </main>
+        <!-- Scroll Top -->
+        <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+        <!-- Preloader -->
+        <div id="preloader"></div>
+        <!-- Vendor JS Files -->
+        <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="assets/vendor/php-email-form/validate.js"></script>
+        <script src="assets/vendor/aos/aos.js"></script>
+        <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+        <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+        <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+        <!-- Main JS File -->
+        <script src="assets/js/main.js"></script>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+            import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+            const firebaseConfig = { /* your config here */ };
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            const email = document.getElementById("email");
+            const password = document.getElementById("password");
+            const status = document.getElementById("status");
+
+            document.getElementById("signUpBtn").addEventListener("click", async () => {
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+                    status.textContent = "Signed up as " + userCredential.user.email;
+                    // Optional: redirect or show welcome screen
+                } catch (err) {
+                    status.textContent = "Error: " + err.message;
+                }
+            });
+        </script>
+    </body>
+</html>
