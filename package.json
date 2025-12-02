@@ -5,12 +5,17 @@
   "scripts": {
     "build": "cp -r public/* dist/",
     "deploy": "firebase deploy",
-    "serve": "firebase serve"
+    "serve": "firebase serve",
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "firebase": "^11.6.1"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase": "^11.10.0",
+    "stripe": "^14.25.0"
   },
   "devDependencies": {
-    "firebase-tools": "^12.0.0"
+    "firebase-tools": "^14.26.0"
   }
-} 
+}

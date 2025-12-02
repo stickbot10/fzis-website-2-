@@ -1,0 +1,20 @@
+QUICK DEPLOYMENT STEPS
+======================
+
+1. Install functions dependencies:
+   cd functions
+   npm install
+   cd ..
+
+2. Set your Stripe secret key (replace with your actual key):
+   firebase functions:config:set stripe.secret_key="sk_test_51SZrESH61BLdlliV0qEnUvkXpzcoeCUB6UQ6GYdGjtJSXIUJxI5bMjxw0vofdu5JquIKkqSLNvVMDuV4tyAiSo0G00gq2k44wj"
+
+3. Deploy everything:
+   firebase deploy
+
+4. Test:
+   - Visit https://fzis.org/donate.html
+   - Visit https://fzis.org/payment.html
+
+NOTE: Make sure you're on Firebase Blaze plan (required for Cloud Functions)
+

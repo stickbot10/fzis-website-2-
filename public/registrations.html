@@ -3,12 +3,12 @@
     <head>
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <title>Starter Page - Mentor Bootstrap Template</title>
+        <title>Register - Fatima Zahra Islamic School</title>
         <meta name="description" content="">
         <meta name="keywords" content="">
         <!-- Favicons -->
-        <link href="assets/img/favicon.png" rel="icon">
-        <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <link href="assets/img/FZIS logo.png" rel="icon">
+        <link href="assets/img/FZIS logo.png" rel="apple-touch-icon">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -21,6 +21,20 @@
         <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
         <!-- Main CSS File -->
         <link href="assets/css/main.css" rel="stylesheet">
+        <style>
+            /* Custom style for registration form */
+            .registration-form-section {
+                background-color: #ffffff;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            }
+            
+            /* Ensure footer is slightly darker */
+            .light-background {
+                --background-color: #f5f5f5;
+            }
+        </style>
         <!-- =======================================================
   * Template Name: Mentor
   * Template URL: https://bootstrapmade.com/mentor-free-education-bootstrap-theme/
@@ -31,53 +45,34 @@
     </head>
     <body class="starter-page-page">
         <header id="header" class="header d-flex align-items-center sticky-top">
-            <div class="container-fluid container-xl position-relative d-flex align-items-center"><a href="index.html" class="logo d-flex align-items-center me-auto"> <!-- Uncomment the line below if you also wish to use an image logo --> <!-- <img src="assets/img/logo.png" alt=""> --> <h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
+            <div class="container-fluid container-xl position-relative d-flex align-items-center"><a href="index.html" class="logo d-flex align-items-center me-auto"> <img src="assets/img/FZIS logo.png" alt="FZIS logo" style="height: 60px; margin-right: 10px;"><h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
                 <nav id="navmenu" class="navmenu">
                     <ul>
                         <li><a href="index.html">Home<br></a>
                         </li>
                         <li><a href="about.html">About</a>
                         </li>
-                        <li><a href="courses.html">Courses</a>
-                        </li>
-                        <li><a href="trainers.html">Trainers</a>
+                        <li><a href="trainers.html">Teachers</a>
                         </li>
                         <li><a href="events.html">Events</a>
                         </li>
-                        <li><a href="pricing.html">Pricing</a>
-                        </li>
                         <li class="dropdown">
-                            <a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                            <a href="gallery.html"><span>Gallery</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
-                                <li><a href="#">Dropdown 1</a>
+                                <li><a href="gallery-photos.html">Photos</a>
                                 </li>
-                                <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                    <ul>
-                                        <li><a href="#">Deep Dropdown 1</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 2</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 3</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 4</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 5</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Dropdown 2</a>
-                                </li>
-                                <li><a href="#">Dropdown 3</a>
-                                </li>
-                                <li><a href="#">Dropdown 4</a>
+                                <li><a href="gallery-videos.html">Videos</a>
                                 </li>
                             </ul>
+                        </li>
+                        <li><a href="pricing.html">Pricing</a>
                         </li>
                         <li><a href="contact.html">Contact</a>
                         </li>
                     </ul><i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-                </nav><a class="btn-getstarted" href="courses.html">Donate</a>
-                <a class="btn-getstarted" href="courses.html">Get Started</a>
+                </nav><a class="btn-getstarted" href="donate.html">Donate</a>
+                <a class="btn-getstarted" href="registrations.html">Register</a>
+                <a class="btn-getstarted btn-login" href="#" onclick="alert('Portal URL will be added soon'); return false;">Login</a>
             </div>
         </header>
         <main class="main">
@@ -98,17 +93,18 @@
                         <ol>
                             <li><a href="index.html">Home</a>
                             </li>
-                            <li class="current">Starter Page</li>
+                            <li class="current">Register</li>
                         </ol>
                     </div>
                 </nav>
             </div>
             <!-- End Page Title -->
-            <!-- Starter Section Section -->
-            <section id="starter-section" class="section bg-light">
+            <!-- Registration Form Section -->
+            <section id="registration-form" class="section">
                 <div class="container" data-aos="fade-up">
-                    <h2 class="text-center text-success fw-bold mb-4">FZIS Waiting List Form</h2>
-                    <form id="registrationForm" method="POST">
+                    <div class="registration-form-section">
+                        <h2 class="text-center text-success fw-bold mb-4">FZIS Waiting List Form</h2>
+                        <form id="registrationForm" method="POST">
                         <h5 class="text-success mt-5">Parent(s)/Guardian(s) Information</h5>
                         <div class="mb-3">
                             <label for="fatherName" class="form-label">Full Name of Father</label>
@@ -192,8 +188,10 @@
                         </div>
                         <button type="submit" class="btn btn-success w-100">Submit</button>
                     </form>
+                    </div> <!-- Close registration-form-section -->
+                    
                     <div class="mt-5">
-                        <p>If you have any trouble filling out the form, please contact:</p>
+                        <p>If you have trouble filling out the form, please contact:</p>
                         <ul>
                             <li>Syed Zahir Ul Husnain – 0413 169 240 – <a href="mailto:shahzahir2006@yahoo.com">shahzahir2006@yahoo.com</a>
                             </li>

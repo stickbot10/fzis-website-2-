@@ -9,6 +9,25 @@
       "**/tests/**",
       "**/package*.json",
       "**/README.md"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/create-donation-checkout",
+        "function": "createDonationCheckout"
+      },
+      {
+        "source": "/create-enrollment-checkout",
+        "function": "createEnrollmentCheckout"
+      },
+      {
+        "source": "/verify-session/:sessionId",
+        "function": "verifySession"
+      }
     ]
+  },
+  "functions": {
+    "source": "functions"
   }
 }

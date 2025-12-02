@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <title>Prayer Times Arc - Fatima Zahra Islamic School</title>
+        <meta name="description" content="Visualize Islamic prayer times along the Sun's path across the sky">
+        <meta name="keywords" content="prayer times, sun arc, Islamic calendar, salah">
+        <!-- Favicons -->
+        <link href="assets/img/FZIS logo.png" rel="icon">
+        <link href="assets/img/FZIS logo.png" rel="apple-touch-icon">
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com" rel="preconnect">
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link href="react-paypal-button-v2-master/css/theme.css" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <!-- Vendor CSS Files -->
+        <link href="../bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+        <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+        <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+        <!-- Main CSS File -->
+        <link href="assets/css/main.css" rel="stylesheet">
+        <style>
+            .prayer-arc-container {
+                background: linear-gradient(to bottom, #0a0e27 0%, #1a1f3a 50%, #2a2f4a 100%);
+                min-height: 100vh;
+                padding: 100px 20px 40px;
+                position: relative;
+                overflow-x: hidden;
+                transition: background 1s ease;
+            }
+            
+            .arc-canvas-wrapper {
+                position: relative;
+                width: 100%;
+                max-width: 900px;
+                margin: 40px auto;
+                padding: 20px;
+                background: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            #sunArcCanvas {
+                width: 100%;
+                height: auto;
+                display: block;
+                background: transparent;
+                cursor: crosshair;
+            }
+            
+            .time-tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.8);
+                color: #ffffff;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                white-space: nowrap;
+            }
+            
+            .prayer-tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.85);
+                color: #ffffff;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 13px;
+                pointer-events: none;
+                z-index: 1001;
+                white-space: nowrap;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+            
+            .upcoming-prayer-annotation {
+                position: absolute;
+                background: #2d8659;
+                color: #ffffff;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                z-index: 999;
+                white-space: nowrap;
+                box-shadow: 0 2px 6px rgba(45, 134, 89, 0.4);
+            }
+            
+            .prayer-info-panel {
+                display: none;
+            }
+            
+            .location-info {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .settings-panel {
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px auto;
+                max-width: 800px;
+                color: #333333;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            .settings-panel h4 {
+                color: #2d8659;
+                margin-bottom: 15px;
+                font-size: 1.2rem;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #444444;
+                font-size: 0.9rem;
+            }
+            
+            .form-group select {
+                width: 100%;
+                padding: 10px;
+                border-radius: 8px;
+                border: 1px solid #d0d0d0;
+                background: #ffffff;
+                color: #333333;
+                font-size: 1rem;
+            }
+            
+            .form-group select option {
+                background: #ffffff;
+                color: #333333;
+            }
+            
+            .prayer-legend {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.9rem;
+                color: #444444;
+            }
+            
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid #d0d0d0;
+            }
+            
+            .loading-message {
+                text-align: center;
+                color: #444444;
+                padding: 40px;
+                font-size: 1.1rem;
+            }
+            
+            .error-message {
+                text-align: center;
+                color: #ff6b6b;
+                padding: 20px;
+                background: rgba(255, 107, 107, 0.1);
+                border-radius: 10px;
+                margin: 20px auto;
+                max-width: 600px;
+            }
+            
+            @media (max-width: 768px) {
+                .prayer-arc-container {
+                    padding: 80px 10px 20px;
+                }
+                
+                .arc-canvas-wrapper {
+                    padding: 10px;
+                }
+                
+                .prayer-info-panel,
+                .settings-panel {
+                    padding: 15px;
+                    margin: 15px auto;
+                }
+            }
+        </style>
+    </head>
+    <body class="prayer-arc-page">
+        <header id="header" class="header d-flex align-items-center sticky-top">
+            <div class="container-fluid container-xl position-relative d-flex align-items-center">
+                <a href="index.html" class="logo d-flex align-items-center me-auto">
+                    <img src="assets/img/FZIS logo.png" alt="FZIS logo" style="height: 60px; margin-right: 10px;">
+                    <h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1>
+                </a>
+                <nav id="navmenu" class="navmenu">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="trainers.html">Teachers</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="prayer-arc.html" class="active">Prayer Arc</a></li>
+                        <li class="dropdown">
+                            <a href="gallery.html"><span>Gallery</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                            <ul>
+                                <li><a href="gallery-photos.html">Photos</a></li>
+                                <li><a href="gallery-videos.html">Videos</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                    <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+                </nav>
+                <a class="btn-getstarted d-none d-xl-inline-block" href="donate.html">Donate</a>
+                <a class="btn-getstarted d-none d-xl-inline-block" href="registrations.html">Register</a>
+                <a class="btn-getstarted btn-login d-none d-xl-inline-block" href="#" onclick="alert('Portal URL will be added soon'); return false;">Login</a>
+            </div>
+        </header>
+        
+        <main class="main">
+            <div class="prayer-arc-container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="location-info" data-aos="fade-down" style="display: none;">
+                                <!-- Location and date removed per requirements -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="loading-message" class="loading-message">
+                        <i class="bi bi-hourglass-split"></i> Loading prayer times and location...
+                    </div>
+                    
+                    <div id="error-message" class="error-message" style="display: none;"></div>
+                    
+                    <div class="arc-canvas-wrapper" id="canvas-wrapper" style="display: none;">
+                        <canvas id="sunArcCanvas"></canvas>
+                        <div id="time-tooltip" class="time-tooltip" style="display: none;"></div>
+                        <div id="prayer-tooltip" class="prayer-tooltip" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="settings-panel" id="settings-panel" style="display: none;">
+                        <h4><i class="bi bi-gear"></i> Settings</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="calculation-method">Calculation Method</label>
+                                    <select id="calculation-method">
+                                        <option value="1">Shia Ithna-Ansari</option>
+                                        <option value="2">University of Islamic Sciences, Karachi</option>
+                                        <option value="3">Islamic Society of North America</option>
+                                        <option value="4">Muslim World League</option>
+                                        <option value="5">Umm Al-Qura University, Makkah</option>
+                                        <option value="6">Egyptian General Authority of Survey</option>
+                                        <option value="7" selected>Institute of Geophysics, University of Tehran</option>
+                                        <option value="8">Gulf Region</option>
+                                        <option value="9">Kuwait</option>
+                                        <option value="10">Qatar</option>
+                                        <option value="11">Majlis Ugama Islam Singapura, Singapore</option>
+                                        <option value="12">Union Organization islamic de France</option>
+                                        <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
+                                        <option value="14">Spiritual Administration of Muslims of Russia</option>
+                                        <option value="15">Moonsighting Committee Worldwide</option>
+                                        <option value="16">Dubai (experimental)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="asr-madhhab">Asr Madhhab</label>
+                                    <select id="asr-madhhab">
+                                        <option value="0">Standard (Shafi, Maliki, Hanbali)</option>
+                                        <option value="1">Hanafi</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="latitude-adjustment">Latitude Adjustment Method</label>
+                                    <select id="latitude-adjustment">
+                                        <option value="1">Angle Based</option>
+                                        <option value="2">One Seventh</option>
+                                        <option value="3" selected>Middle of the Night</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="midnight-mode">Midnight Mode</label>
+                                    <select id="midnight-mode">
+                                        <option value="0">Standard (Midnight to Fajr)</option>
+                                        <option value="1" selected>Jafari (Sunset to Sunrise)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prayer-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #FFD700;"></div>
+                                <span>Current Sun Position</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #4A90E2;"></div>
+                                <span>Fajr</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #FF6B6B;"></div>
+                                <span>Sunrise</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #50C878;"></div>
+                                <span>Dhuhr</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #FFA500;"></div>
+                                <span>Asr</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #FF1493;"></div>
+                                <span>Maghrib</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9370DB;"></div>
+                                <span>Isha</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer id="footer" class="footer position-relative light-background">
+            <div class="container footer-top">
+                <div class="row gy-4">
+                    <div class="col-lg-4 col-md-6 footer-about">
+                        <a href="index.html" class="logo d-flex align-items-center">
+                            <span class="sitename">FZIS</span>
+                        </a>
+                        <div class="footer-contact pt-3">
+                            <p>Stretton State College</p>
+                            <p>226 Illaweena St, Stretton QLD 4116</p>
+                            <p><strong>Email:</strong> <span>fzis.bne@gmail.com</span></p>
+                        </div>
+                        <div class="social-links d-flex mt-4">
+                            <a href=""><i class="bi bi-twitter-x"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About us</a></li>
+                            <li><a href="trainers.html">Teachers</a></li>
+                            <li><a href="events.html">Events</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="registrations.html">Register</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="donate.html">Donate</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="container copyright text-center mt-4">
+                <p>© <span>Copyright</span> <strong class="px-1 sitename">FZIS</strong> <span>All Rights Reserved</span></p>
+                <div class="credits">
+                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Scroll Top -->
+        <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+            <i class="bi bi-arrow-up-short"></i>
+        </a>
+        
+        <!-- Preloader -->
+        <div id="preloader"></div>
+        
+        <!-- Vendor JS Files -->
+        <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="assets/vendor/php-email-form/validate.js"></script>
+        <script src="assets/vendor/aos/aos.js"></script>
+        <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+        <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+        <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+        <!-- Main JS File -->
+        <script src="assets/js/main.js"></script>
+        
+        <!-- Prayer Arc Script -->
+        <script>
+            // Prayer Arc Visualization
+            class PrayerArcVisualization {
+                constructor() {
+                    this.canvas = document.getElementById('sunArcCanvas');
+                    this.ctx = this.canvas.getContext('2d');
+                    this.prayerTimes = {};
+                    this.currentLocation = { lat: null, lng: null, city: 'Brisbane', country: 'Australia' };
+                    this.calculationMethod = 7; // Default: Institute of Geophysics, University of Tehran
+                    this.asrMadhhab = 0; // Default: Standard
+                    this.latitudeAdjustmentMethod = 3; // Default: Middle of the Night
+                    this.midnightMode = 1; // Default: Standard
+                    this.animationId = null;
+                    this.prayerPositions = [];
+                    this.hoveredPrayer = null;
+                    this.hoveredAngle = null;
+                    this.hoveredArcPosition = null; // Position on arc for sun when hovering
+                    this.hoveredMousePosition = null; // Actual mouse position for better alignment
+                    this.timeTooltip = document.getElementById('time-tooltip');
+                    this.prayerTooltip = document.getElementById('prayer-tooltip');
+                    this.prayerTimes = {};
+                    this.midnight = null;
+                    this.animationFrame = 0;
+                    this.isHovering = false; // Track if user is hovering on arc
+                    this.isDragging = false; // Track if user is dragging the sun
+                    this.currentSunPosition = null; // Store current sun position for drag detection
+                    this.setupCanvas();
+                    this.setupEventListeners();
+                    this.setupInteraction();
+                }
+                
+                setupCanvas() {
+                    const resizeCanvas = () => {
+                        const wrapper = document.getElementById('canvas-wrapper');
+                        // Smaller on mobile for better fit, limit on very large screens
+                        const isMobile = window.innerWidth < 768;
+                        const isLargeScreen = window.innerWidth > 1600;
+                        const maxWidth = isMobile ? Math.min(350, window.innerWidth - 20) : (isLargeScreen ? 900 : Math.min(1000, window.innerWidth - 40));
+                        const height = isMobile ? Math.max(400, maxWidth * 0.9) : Math.max(600, maxWidth * 0.7);
+                        
+                        this.canvas.width = maxWidth;
+                        this.canvas.height = height;
+                        this.draw();
+                    };
+                    
+                    resizeCanvas();
+                    window.addEventListener('resize', resizeCanvas);
+                }
+                
+                setupEventListeners() {
+                    document.getElementById('calculation-method').addEventListener('change', (e) => {
+                        this.calculationMethod = parseInt(e.target.value);
+                        this.loadPrayerTimes();
+                    });
+                    
+                    document.getElementById('asr-madhhab').addEventListener('change', (e) => {
+                        this.asrMadhhab = parseInt(e.target.value);
+                        this.loadPrayerTimes();
+                    });
+                    
+                    document.getElementById('latitude-adjustment').addEventListener('change', (e) => {
+                        this.latitudeAdjustmentMethod = parseInt(e.target.value);
+                        this.loadPrayerTimes();
+                    });
+                    
+                    document.getElementById('midnight-mode').addEventListener('change', (e) => {
+                        this.midnightMode = parseInt(e.target.value);
+                        this.loadPrayerTimes();
+                    });
+                }
+                
+                isPointOnSun(x, y) {
+                    // Check if point is within the sun's radius (including beams)
+                    if (!this.currentSunPosition) return false;
+                    
+                    const sunRadius = 20;
+                    const beamLength = 15;
+                    const totalRadius = sunRadius + beamLength; // Account for beams
+                    const dragRadius = totalRadius + 10; // Add some tolerance for easier dragging
+                    
+                    const dx = x - this.currentSunPosition.x;
+                    const dy = y - this.currentSunPosition.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    return distance < dragRadius;
+                }
+                
+                setupInteraction() {
+                    const wrapper = document.getElementById('canvas-wrapper');
+                    
+                    // Desktop: Mouse down - check if clicking on sun
+                    this.canvas.addEventListener('mousedown', (e) => {
+                        const rect = this.canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        if (this.isPointOnSun(x, y)) {
+                            this.isDragging = true;
+                            // Start dragging the sun
+                            const angle = this.getAngleFromPoint(x, y);
+                            if (angle !== null) {
+                                this.handleInteraction(x, y, true);
+                            }
+                        }
+                    });
+                    
+                    // Desktop: Mouse move - only update if dragging sun (NOT on hover)
+                    this.canvas.addEventListener('mousemove', (e) => {
+                        const rect = this.canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        if (this.isDragging) {
+                            // Dragging the sun - follow mouse
+                            this.handleInteraction(x, y, true);
+                        } else {
+                            // Not dragging - just check for prayer markers (no sun movement, no tooltip on circle)
+                            this.handleInteraction(x, y, false);
+                        }
+                    });
+                    
+                    // Desktop: Mouse up - stop dragging and return sun to current time
+                    this.canvas.addEventListener('mouseup', (e) => {
+                        if (this.isDragging) {
+                            this.isDragging = false;
+                            this.isHovering = false;
+                            this.hoveredAngle = null;
+                            this.hoveredArcPosition = null;
+                            this.hoveredMousePosition = null;
+                            this.hideTooltips();
+                            this.draw(); // Return sun to current time position
+                        }
+                    });
+                    
+                    // Desktop: Mouse leave - stop dragging if mouse leaves canvas
+                    this.canvas.addEventListener('mouseleave', () => {
+                        if (this.isDragging) {
+                            this.isDragging = false;
+                            this.isHovering = false;
+                            this.hoveredAngle = null;
+                            this.hoveredArcPosition = null;
+                            this.hoveredMousePosition = null;
+                            this.draw(); // Return sun to current time position
+                        }
+                        this.hideTooltips();
+                    });
+                    
+                    // Mobile: Touch start - check if touching the sun or circle
+                    this.canvas.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        const rect = this.canvas.getBoundingClientRect();
+                        const touch = e.touches[0];
+                        const x = touch.clientX - rect.left;
+                        const y = touch.clientY - rect.top;
+                        
+                        // Check if touching a prayer marker first
+                        let touchedPrayer = null;
+                        const prayerTouchRadius = 30; // Larger radius for touch
+                        
+                        for (const prayer of this.prayerPositions) {
+                            const dx = x - prayer.x;
+                            const dy = y - prayer.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < prayerTouchRadius) {
+                                touchedPrayer = prayer;
+                                break;
+                            }
+                        }
+                        
+                        if (touchedPrayer) {
+                            // Tapped on prayer marker - show tooltip but don't drag
+                            this.isDragging = false;
+                            this.hoveredPrayer = touchedPrayer;
+                            this.hoveredAngle = null;
+                            this.hoveredArcPosition = null;
+                            this.isHovering = false;
+                            this.showPrayerTooltip(touchedPrayer, x, y);
+                            this.draw(); // Return sun to current time
+                        } else {
+                            // Check if touching the circle (not just the sun)
+                            const angle = this.getAngleFromPoint(x, y);
+                            if (angle !== null) {
+                                // Touched the circle - show time tooltip
+                                this.hoveredAngle = angle;
+                                this.hoveredPrayer = null;
+                                this.isHovering = true;
+                                const pos = this.calculateArcPosition(angle);
+                                this.hoveredArcPosition = pos;
+                                this.showTimeTooltip(angle, x, y);
+                                this.draw();
+                            } else if (this.isPointOnSun(x, y)) {
+                                // Touched the sun - start dragging
+                                this.isDragging = true;
+                                const sunAngle = this.getAngleFromPoint(x, y);
+                                if (sunAngle !== null) {
+                                    this.handleInteraction(x, y, true);
+                                }
+                            } else {
+                                // Touched elsewhere - hide tooltips
+                                this.hideTooltips();
+                                this.draw();
+                            }
+                        }
+                    });
+                    
+                    // Mobile: Touch move - only update if dragging
+                    this.canvas.addEventListener('touchmove', (e) => {
+                        e.preventDefault();
+                        if (!this.isDragging) return; // Only move sun if actively dragging
+                        
+                        const rect = this.canvas.getBoundingClientRect();
+                        const touch = e.touches[0];
+                        const x = touch.clientX - rect.left;
+                        const y = touch.clientY - rect.top;
+                        this.handleInteraction(x, y, true); // Pass isDragging flag
+                    });
+                    
+                    // Mobile: Touch end - stop dragging and return sun to current time
+                    this.canvas.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        if (this.isDragging) {
+                            // Was dragging sun - return to current time
+                            this.isDragging = false;
+                            this.isHovering = false;
+                            this.hoveredAngle = null;
+                            this.hoveredArcPosition = null;
+                            this.hoveredMousePosition = null;
+                            this.hideTooltips();
+                            this.draw(); // Return sun to current time position
+                        }
+                        // If not dragging, tooltip stays visible until next touch
+                    });
+                    
+                    // Mobile: Touch cancel - same as touchend
+                    this.canvas.addEventListener('touchcancel', (e) => {
+                        e.preventDefault();
+                        this.isDragging = false;
+                        this.isHovering = false;
+                        this.hoveredAngle = null;
+                        this.hoveredArcPosition = null;
+                        this.hoveredMousePosition = null;
+                        this.hideTooltips();
+                        this.draw(); // Return sun to current time position
+                    });
+                }
+                
+                handleInteraction(x, y, isDragging = false) {
+                    // Only update sun position if actively dragging the sun
+                    if (!isDragging && !this.isDragging) {
+                        // Not dragging - just handle tooltips for prayer markers (desktop hover)
+                        let hoveredPrayer = null;
+                        const prayerHoverRadius = 20;
+                        
+                        for (const prayer of this.prayerPositions) {
+                            const dx = x - prayer.x;
+                            const dy = y - prayer.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < prayerHoverRadius) {
+                                hoveredPrayer = prayer;
+                                break;
+                            }
+                        }
+                        
+                        if (hoveredPrayer) {
+                            this.hoveredPrayer = hoveredPrayer;
+                            this.showPrayerTooltip(hoveredPrayer, x, y);
+                        } else {
+                            this.hoveredPrayer = null;
+                            this.hideTooltips();
+                        }
+                        return; // Don't move sun if not dragging
+                    }
+                    
+                    // Dragging the sun - get angle from position and move sun there
+                    const angle = this.getAngleFromPoint(x, y);
+                    
+                    if (angle !== null) {
+                        // Position is on the arc - move sun to this position
+                        this.hoveredAngle = angle;
+                        this.isHovering = true;
+                        // Calculate position on arc for sun
+                        const pos = this.calculateArcPosition(angle);
+                        this.hoveredArcPosition = pos;
+                        this.hoveredMousePosition = { x: pos.x, y: pos.y };
+                        
+                        // Show time tooltip while dragging
+                        this.hoveredPrayer = null;
+                        this.showTimeTooltip(angle, x, y);
+                        this.draw(); // Redraw to show sun at dragged position
+                    } else {
+                        // Not on arc - don't move sun but still allow dragging
+                        // (user might drag off the arc temporarily)
+                        this.draw(); // Keep current sun position
+                    }
+                }
+                
+                showTimeTooltip(angle, x, y) {
+                    const time = this.getTimeFromAngle(angle);
+                    const timeString = this.minutesToTime(time);
+                    
+                    this.timeTooltip.textContent = timeString;
+                    this.timeTooltip.style.display = 'block';
+                    this.timeTooltip.style.left = (x + 15) + 'px';
+                    this.timeTooltip.style.top = (y - 10) + 'px';
+                    
+                    // Adjust if tooltip goes off screen
+                    const rect = this.timeTooltip.getBoundingClientRect();
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    if (rect.right > canvasRect.right) {
+                        this.timeTooltip.style.left = (x - rect.width - 15) + 'px';
+                    }
+                    if (rect.top < canvasRect.top) {
+                        this.timeTooltip.style.top = (y + 20) + 'px';
+                    }
+                }
+                
+                showPrayerTooltip(prayer, x, y) {
+                    const minutesUntil = this.getMinutesUntilPrayer(prayer.minutes);
+                    const hours = Math.floor(minutesUntil / 60);
+                    const mins = minutesUntil % 60;
+                    let timeText;
+                    if (hours > 0) {
+                        timeText = `${hours}h ${mins}m`;
+                    } else {
+                        timeText = `${mins}m`;
+                    }
+                    
+                    this.prayerTooltip.innerHTML = `
+                        <strong>${prayer.label}</strong><br>
+                        ${this.minutesToTime(prayer.minutes)}<br>
+                        <span style="color: #2d8659;">${timeText} until</span>
+                    `;
+                    this.prayerTooltip.style.display = 'block';
+                    this.prayerTooltip.style.left = (x + 15) + 'px';
+                    this.prayerTooltip.style.top = (y - 10) + 'px';
+                    
+                    // Adjust if tooltip goes off screen
+                    const rect = this.prayerTooltip.getBoundingClientRect();
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    if (rect.right > canvasRect.right) {
+                        this.prayerTooltip.style.left = (x - rect.width - 15) + 'px';
+                    }
+                    if (rect.top < canvasRect.top) {
+                        this.prayerTooltip.style.top = (y + 20) + 'px';
+                    }
+                }
+                
+                hideTooltips() {
+                    this.timeTooltip.style.display = 'none';
+                    this.prayerTooltip.style.display = 'none';
+                    this.hoveredPrayer = null;
+                    this.hoveredAngle = null;
+                    this.hoveredArcPosition = null;
+                    this.hoveredMousePosition = null;
+                    this.isHovering = false;
+                    // Redraw to show sun at current time
+                    this.draw();
+                }
+                
+                updateBackgroundColor(sunAngle = null) {
+                    const container = document.querySelector('.prayer-arc-container');
+                    if (!container) return;
+                    
+                    // Use provided angle (from hover) or calculate from current time
+                    let angle = sunAngle;
+                    if (angle === null || angle === undefined) {
+                        // Calculate angle from current time
+                        const now = new Date();
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        const sunrise = this.prayerTimes.sunrise;
+                        const dhuhr = this.prayerTimes.dhuhr;
+                        const maghrib = this.prayerTimes.maghrib;
+                        const fajr = this.prayerTimes.fajr;
+                        const midnight = this.midnight || (fajr + (24 * 60 - fajr + maghrib) / 2);
+                        
+                        if (currentMinutes >= sunrise && currentMinutes <= maghrib) {
+                            // During day - between sunrise and sunset
+                            if (currentMinutes <= dhuhr) {
+                                const progress = (currentMinutes - sunrise) / (dhuhr - sunrise);
+                                angle = progress * 90; // 0° to 90°
+                            } else {
+                                const progress = (currentMinutes - dhuhr) / (maghrib - dhuhr);
+                                angle = 90 + (progress * 90); // 90° to 180°
+                            }
+                        } else if (currentMinutes < sunrise) {
+                            // Before sunrise
+                            if (currentMinutes >= midnight) {
+                                const progress = (currentMinutes - midnight) / (sunrise - midnight);
+                                angle = -90 + (progress * 90); // -90° to 0°
+                            } else {
+                                // Between midnight (previous day) and fajr
+                                const progress = (currentMinutes + 24 * 60 - midnight) / ((fajr + 24 * 60) - midnight);
+                                angle = -180 + (progress * 90); // -180° to -90°
+                            }
+                        } else {
+                            // After sunset
+                            const isha = this.prayerTimes.isha;
+                            if (currentMinutes <= midnight) {
+                                const progress = (currentMinutes - maghrib) / (midnight - maghrib);
+                                angle = 180 + (progress * 90); // 180° to 270°
+                            } else {
+                                // After midnight, before fajr
+                                const progress = (currentMinutes - midnight) / ((fajr + 24 * 60) - midnight);
+                                angle = 270 + (progress * 90); // 270° to 360°
+                                if (angle >= 360) angle -= 360;
+                            }
+                        }
+                    }
+                    
+                    let color1, color2, color3;
+                    
+                    // Map angle to background colors (0° = sunrise, 180° = sunset)
+                    if (angle < 0) {
+                        // Before sunrise - deep blue (dawn/night)
+                        color1 = '#0a0e27'; color2 = '#1a1f3a'; color3 = '#2a3f5a';
+                    } else if (angle <= 45) {
+                        // Sunrise to early morning - orange/yellow gradient
+                        const progress = angle / 45;
+                        color1 = `rgb(${Math.round(26 + (255 - 26) * progress)}, ${Math.round(31 + (107 - 31) * progress)}, ${Math.round(58 + (53 - 58) * progress)})`;
+                        color2 = `rgb(${Math.round(255 * progress)}, ${Math.round(165 * progress)}, 0)`;
+                        color3 = `rgb(${Math.round(255 * progress)}, ${Math.round(215 * progress)}, 0)`;
+                    } else if (angle <= 90) {
+                        // Morning to noon - yellow to bright blue
+                        const progress = (angle - 45) / 45;
+                        color1 = `rgb(255, ${Math.round(165 + (74 - 165) * progress)}, 0)`;
+                        color2 = `rgb(${Math.round(255 - 168 * progress)}, ${Math.round(165 + 61 * progress)}, ${Math.round(206 * progress)})`;
+                        color3 = `rgb(${Math.round(255 - 165 * progress)}, ${Math.round(224 - 59 * progress)}, ${Math.round(230 * progress)})`;
+                    } else if (angle <= 135) {
+                        // Noon to afternoon - bright blue
+                        const progress = (angle - 90) / 45;
+                        color1 = `rgb(${Math.round(74 + 182 * progress)}, ${Math.round(144 + 143 * progress)}, ${Math.round(226 + 9 * progress)})`;
+                        color2 = `rgb(${Math.round(135 + 122 * progress)}, ${Math.round(206 + 44 * progress)}, ${Math.round(230 + 10 * progress)})`;
+                        color3 = `rgb(${Math.round(176 + 79 * progress)}, ${Math.round(224 + 31 * progress)}, ${Math.round(230)})`;
+                    } else if (angle <= 180) {
+                        // Afternoon to sunset - blue to orange/red
+                        const progress = (angle - 135) / 45;
+                        color1 = `rgb(${Math.round(255 - 210 * progress)}, ${Math.round(69 - 24 * progress)}, ${Math.round(0 + 71 * progress)})`;
+                        color2 = `rgb(${Math.round(255 - 192 * progress)}, ${Math.round(99 - 35 * progress)}, ${Math.round(71 + 76 * progress)})`;
+                        color3 = `rgb(${Math.round(255 - 100 * progress)}, ${Math.round(20 + 219 * progress)}, ${Math.round(147 + 108 * progress)})`;
+                    } else {
+                        // After sunset - orange/red to dark blue (night)
+                        color1 = '#ff4500'; color2 = '#1a1f3a'; color3 = '#0a0e27';
+                    }
+                    
+                    container.style.background = `linear-gradient(to bottom, ${color1} 0%, ${color2} 50%, ${color3} 100%)`;
+                }
+                
+                async getLocation() {
+                    return new Promise((resolve) => {
+                        // Set default location immediately
+                        this.currentLocation.lat = -27.4698;
+                        this.currentLocation.lng = 153.0251;
+                        
+                        // Resolve immediately with default, then try to get real location in background
+                        resolve(this.currentLocation);
+                        
+                        // Try to get real location in background (non-blocking)
+                        if (navigator.geolocation) {
+                            // Add timeout to geolocation (5 seconds)
+                            const geoTimeout = setTimeout(() => {
+                                console.warn('Geolocation timeout, using default location');
+                            }, 5000);
+                            
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    clearTimeout(geoTimeout);
+                                    this.currentLocation.lat = position.coords.latitude;
+                                    this.currentLocation.lng = position.coords.longitude;
+                                    // Reload prayer times with new location
+                                    this.loadPrayerTimes();
+                                },
+                                (error) => {
+                                    clearTimeout(geoTimeout);
+                                    console.warn('Geolocation error:', error);
+                                    // Already using default location, no need to change
+                                },
+                                {
+                                    timeout: 5000,
+                                    enableHighAccuracy: false,
+                                    maximumAge: 300000 // Accept cached location up to 5 minutes old
+                                }
+                            );
+                        }
+                    });
+                }
+                
+                async loadPrayerTimes() {
+                    try {
+                        // Show loading message
+                        document.getElementById('loading-message').style.display = 'block';
+                        document.getElementById('error-message').style.display = 'none';
+                        document.getElementById('canvas-wrapper').style.display = 'none';
+                        document.getElementById('settings-panel').style.display = 'none';
+                        
+                        const today = new Date();
+                        const day = today.getDate();
+                        const month = today.getMonth() + 1;
+                        const year = today.getFullYear();
+                        
+                        // Always use Brisbane coordinates directly for reliability
+                        const brisbaneLat = -27.4698;
+                        const brisbaneLng = 153.0251;
+                        
+                        // Use coordinates API with Brisbane's coordinates
+                        const apiUrl = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?latitude=${brisbaneLat}&longitude=${brisbaneLng}&method=${this.calculationMethod}&school=${this.asrMadhhab}&midnightMode=${this.midnightMode}&latitudeAdjustmentMethod=${this.latitudeAdjustmentMethod}`;
+                        
+                        console.log('Loading prayer times from:', apiUrl);
+                        
+                        // Add timeout to prevent hanging (increased to 15 seconds)
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => {
+                            controller.abort();
+                            console.error('API request timed out');
+                        }, 15000);
+                        
+                        const response = await fetch(apiUrl, { 
+                            signal: controller.signal,
+                            cache: 'no-cache'
+                        });
+                        clearTimeout(timeoutId);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('API response:', data);
+                        
+                        if (data.code === 200 && data.data && data.data.timings) {
+                            const timings = data.data.timings;
+                            this.prayerTimes = {
+                                fajr: this.timeToMinutes(timings.Fajr),
+                                sunrise: this.timeToMinutes(timings.Sunrise),
+                                dhuhr: this.timeToMinutes(timings.Dhuhr),
+                                asr: this.timeToMinutes(timings.Asr),
+                                maghrib: this.timeToMinutes(timings.Maghrib),
+                                isha: this.timeToMinutes(timings.Isha)
+                            };
+                            
+                            // Calculate midnight based on mode
+                            if (this.midnightMode === 1) {
+                                // Jafari: Sunset to Sunrise
+                                this.midnight = this.prayerTimes.maghrib + (this.prayerTimes.fajr - this.prayerTimes.maghrib) / 2;
+                            } else {
+                                // Standard: Midnight to Fajr
+                                this.midnight = 12 * 60; // 12:00 AM
+                            }
+                            
+                            // Location and date display removed per requirements
+                            
+                            document.getElementById('loading-message').style.display = 'none';
+                            document.getElementById('error-message').style.display = 'none';
+                            document.getElementById('canvas-wrapper').style.display = 'block';
+                            document.getElementById('settings-panel').style.display = 'block';
+                            
+                            this.startAnimation();
+                        } else {
+                            throw new Error('Invalid API response: ' + JSON.stringify(data));
+                        }
+                    } catch (error) {
+                        console.error('Error loading prayer times:', error);
+                        document.getElementById('loading-message').style.display = 'none';
+                        document.getElementById('error-message').style.display = 'block';
+                        
+                        let errorMessage = 'Failed to load prayer times. ';
+                        if (error.name === 'AbortError') {
+                            errorMessage += 'Request timed out. Please check your connection and try refreshing.';
+                        } else if (error.message.includes('HTTP error')) {
+                            errorMessage += 'Server error. Please try again later.';
+                        } else if (error.message.includes('Failed to fetch')) {
+                            errorMessage += 'Network error. Please check your internet connection.';
+                        } else {
+                            errorMessage += 'Please check your connection and try again.';
+                        }
+                        
+                        const errorElement = document.getElementById('error-message');
+                        errorElement.textContent = errorMessage;
+                        
+                        // Show retry button
+                        const retryButton = document.createElement('button');
+                        retryButton.textContent = 'Retry';
+                        retryButton.className = 'btn btn-primary mt-2';
+                        retryButton.style.marginTop = '10px';
+                        retryButton.onclick = () => {
+                            errorElement.innerHTML = 'Retrying...';
+                            this.loadPrayerTimes();
+                        };
+                        errorElement.appendChild(document.createElement('br'));
+                        errorElement.appendChild(retryButton);
+                    }
+                }
+                
+                timeToMinutes(timeString) {
+                    const [hours, minutes] = timeString.split(':').map(Number);
+                    return hours * 60 + minutes;
+                }
+                
+                minutesToTime(minutes) {
+                    // Round to nearest minute
+                    const roundedMinutes = Math.round(minutes);
+                    const hours = Math.floor(roundedMinutes / 60);
+                    const mins = roundedMinutes % 60;
+                    const period = hours >= 12 ? 'PM' : 'AM';
+                    const displayHours = hours % 12 || 12;
+                    return `${displayHours}:${String(mins).padStart(2, '0')} ${period}`;
+                }
+                
+                getCurrentSunPosition() {
+                    const now = new Date();
+                    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                    
+                    // Calculate sun position based on real solar altitude
+                    const sunrise = this.prayerTimes.sunrise;
+                    const sunset = this.prayerTimes.maghrib;
+                    
+                    if (currentMinutes < sunrise || currentMinutes > sunset) {
+                        // Before sunrise or after sunset
+                        return null;
+                    }
+                    
+                    // Calculate real solar altitude
+                    const solarAltitude = this.calculateSolarAltitude(currentMinutes, this.currentLocation.lat || -27.47);
+                    
+                    if (solarAltitude < 0) {
+                        return null; // Sun is below horizon
+                    }
+                    
+                    // Calculate progress along arc
+                    const dayLength = sunset - sunrise;
+                    const timeFromSunrise = currentMinutes - sunrise;
+                    const progress = timeFromSunrise / dayLength;
+                    
+                    return {
+                        minutes: currentMinutes,
+                        progress: progress,
+                        altitude: solarAltitude
+                    };
+                }
+                
+                calculateArcPosition(angle) {
+                    const centerX = this.canvas.width / 2;
+                    const centerY = this.canvas.height / 2;
+                    // Smaller radius on mobile, limit on very large screens
+                    const isMobile = window.innerWidth < 768;
+                    const isLargeScreen = window.innerWidth > 1600;
+                    const radiusFactor = isMobile ? 0.38 : (isLargeScreen ? 0.42 : 0.48);
+                    const radius = Math.min(this.canvas.width * radiusFactor, this.canvas.height * radiusFactor);
+                    
+                    // Full 360° circle - convert angle to radians
+                    // Our angle system: 0° = left (Sunrise), 90° = top (Dhuhr), 180° = right (Maghrib/Sunset), 270° = bottom (Midnight)
+                    // Canvas coordinate system: 0° = right, 90° = bottom, 180° = left, 270° = top
+                    // Mapping: Our 0° → canvas 180°, Our 90° → canvas 270°, Our 180° → canvas 0°, Our 270° → canvas 90°
+                    // Formula: canvasAngle = (180 - angle) % 360, with special cases for 90° and 270°
+                    let canvasAngle;
+                    if (angle === 90) {
+                        canvasAngle = 270; // Top
+                    } else if (angle === 270) {
+                        canvasAngle = 90; // Bottom
+                    } else {
+                        canvasAngle = (180 - angle) % 360;
+                        if (canvasAngle < 0) canvasAngle += 360;
+                    }
+                    
+                    const radians = canvasAngle * Math.PI / 180;
+                    const x = centerX + radius * Math.cos(radians);
+                    const y = centerY + radius * Math.sin(radians);
+                    
+                    return { x, y, angle: angle };
+                }
+                
+                getAngleFromPoint(x, y) {
+                    const centerX = this.canvas.width / 2;
+                    const centerY = this.canvas.height / 2;
+                    // Smaller radius on mobile, limit on very large screens
+                    const isMobile = window.innerWidth < 768;
+                    const isLargeScreen = window.innerWidth > 1600;
+                    const radiusFactor = isMobile ? 0.38 : (isLargeScreen ? 0.42 : 0.48);
+                    const radius = Math.min(this.canvas.width * radiusFactor, this.canvas.height * radiusFactor);
+                    
+                    // Calculate angle from center
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Much closer tolerance - only when directly on circle
+                    const tolerance = 15;
+                    if (Math.abs(distance - radius) > tolerance) {
+                        return null; // Not on circle
+                    }
+                    
+                    // Calculate angle from canvas coordinate system
+                    // Canvas: 0° = right, 90° = bottom, 180° = left, 270° = top
+                    let canvasAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    if (canvasAngle < 0) canvasAngle += 360;
+                    
+                    // Convert canvas angle to our angle system:
+                    // Our system: 0° = left (Sunrise), 90° = top (Dhuhr), 180° = right (Maghrib), 270° = bottom (Midnight)
+                    // Canvas: 0° = right, 90° = bottom, 180° = left, 270° = top
+                    // Mapping: canvas 180° → our 0°, canvas 270° → our 90°, canvas 0° → our 180°, canvas 90° → our 270°
+                    // Formula: ourAngle = (180 - canvasAngle) % 360, with special cases
+                    let ourAngle;
+                    if (canvasAngle === 180) {
+                        ourAngle = 0; // Left
+                    } else if (canvasAngle === 270) {
+                        ourAngle = 90; // Top
+                    } else if (canvasAngle === 0 || canvasAngle === 360) {
+                        ourAngle = 180; // Right
+                    } else if (canvasAngle === 90) {
+                        ourAngle = 270; // Bottom
+                    } else {
+                        // For other angles, use inverse mapping
+                        ourAngle = (180 - canvasAngle) % 360;
+                        if (ourAngle < 0) ourAngle += 360;
+                    }
+                    
+                    return ourAngle;
+                }
+                
+                getTimeFromAngle(angle) {
+                    const fajr = this.prayerTimes.fajr;
+                    const sunrise = this.prayerTimes.sunrise;
+                    const dhuhr = this.prayerTimes.dhuhr;
+                    const maghrib = this.prayerTimes.maghrib;
+                    const isha = this.prayerTimes.isha;
+                    const midnight = this.midnight || (fajr + (24 * 60 - fajr + maghrib) / 2);
+                    
+                    // Map 360° circle back to time based on Sunrise (0°) to Sunset/Maghrib (180°)
+                    if (angle < 0) {
+                        // Before sunrise (Fajr area)
+                        const progress = Math.abs(angle) / 90;
+                        const totalNight = (fajr + 24 * 60) - midnight;
+                        return midnight + totalNight * progress;
+                    } else if (angle <= 90) {
+                        // Between Sunrise (0°) and Dhuhr (90°)
+                        const progress = angle / 90;
+                        return sunrise + (dhuhr - sunrise) * progress;
+                    } else if (angle <= 180) {
+                        // Between Dhuhr (90°) and Maghrib (180°)
+                        const progress = (angle - 90) / 90;
+                        return dhuhr + (maghrib - dhuhr) * progress;
+                    } else if (angle <= 270) {
+                        // Between Maghrib (180°) and Midnight (270°)
+                        const progress = (angle - 180) / 90;
+                        return maghrib + (midnight - maghrib) * progress;
+                    } else {
+                        // Between Midnight (270°) and Fajr (360°/0°)
+                        const progress = (angle - 270) / 90;
+                        const timeToFajr = (fajr + 24 * 60) - midnight;
+                        return midnight + timeToFajr * progress;
+                    }
+                }
+                
+                // Calculate solar altitude angle based on time
+                calculateSolarAltitude(minutes, latitude = this.currentLocation.lat || -27.47) {
+                    const date = new Date();
+                    const dayOfYear = this.getDayOfYear(date);
+                    
+                    // Solar declination angle
+                    const declination = 23.45 * Math.sin((360 * (284 + dayOfYear) / 365) * Math.PI / 180);
+                    
+                    // Calculate hour angle from solar noon (Dhuhr)
+                    const solarNoon = this.prayerTimes.dhuhr;
+                    const hoursFromNoon = (minutes - solarNoon) / 60;
+                    const hourAngle = hoursFromNoon * 15; // 15 degrees per hour
+                    
+                    const latRad = latitude * Math.PI / 180;
+                    const decRad = declination * Math.PI / 180;
+                    const hourRad = hourAngle * Math.PI / 180;
+                    
+                    const altitude = Math.asin(
+                        Math.sin(latRad) * Math.sin(decRad) +
+                        Math.cos(latRad) * Math.cos(decRad) * Math.cos(hourRad)
+                    ) * 180 / Math.PI;
+                    
+                    return altitude;
+                }
+                
+                getDayOfYear(date) {
+                    const start = new Date(date.getFullYear(), 0, 0);
+                    const diff = date - start;
+                    return Math.floor(diff / (1000 * 60 * 60 * 24));
+                }
+                
+                // Convert solar altitude to arc position (0-180 degrees)
+                altitudeToArcAngle(altitude, minutes) {
+                    const sunrise = this.prayerTimes.sunrise;
+                    const sunset = this.prayerTimes.maghrib;
+                    const solarNoon = this.prayerTimes.dhuhr;
+                    
+                    // For times outside day, use endpoints
+                    if (altitude < 0 || minutes < sunrise) {
+                        return 0; // Start of arc
+                    }
+                    if (minutes > sunset) {
+                        return 180; // End of arc
+                    }
+                    
+                    // Calculate position based on time progression
+                    // Map time from sunrise to sunset onto arc from 0 to 180 degrees
+                    const dayLength = sunset - sunrise;
+                    const timeFromSunrise = minutes - sunrise;
+                    const progress = timeFromSunrise / dayLength;
+                    
+                    // Use progress to determine arc angle
+                    // Arc goes from 0 (sunrise) to 180 (sunset)
+                    return progress * 180;
+                }
+                
+                getPrayerTimeAngle(prayerKey, prayerMinutes) {
+                    const fajr = this.prayerTimes.fajr;
+                    const sunrise = this.prayerTimes.sunrise;
+                    const dhuhr = this.prayerTimes.dhuhr;
+                    const asr = this.prayerTimes.asr;
+                    const maghrib = this.prayerTimes.maghrib;
+                    const isha = this.prayerTimes.isha;
+                    const midnight = this.midnight || (fajr + (24 * 60 - fajr + maghrib) / 2);
+                    
+                    // Map to 360° circle based on Sunrise (left/0°) to Sunset/Maghrib (right/180°)
+                    // Fajr is before sunrise, Isha and Midnight are after sunset
+                    if (prayerKey === 'fajr') {
+                        // Fajr is before sunrise - position before 0° (left side)
+                        const timeBeforeSunrise = sunrise - fajr;
+                        const totalNight = (fajr + 24 * 60) - midnight;
+                        const progress = timeBeforeSunrise / totalNight;
+                        return -90 * progress; // Negative angle for before sunrise
+                    } else if (prayerKey === 'sunrise') {
+                        return 0; // Left - start of visible arc
+                    } else if (prayerKey === 'dhuhr') {
+                        // Dhuhr is at solar noon - top of arc (90°)
+                        return 90;
+                    } else if (prayerKey === 'asr') {
+                        // Asr is between Dhuhr and Maghrib - map to 90-180°
+                        const progress = (asr - dhuhr) / (maghrib - dhuhr);
+                        return 90 + (progress * 90);
+                    } else if (prayerKey === 'maghrib') {
+                        return 180; // Right - end of visible arc (sunset)
+                    } else if (prayerKey === 'sunset') {
+                        return 180; // Same as Maghrib (sunset)
+                    } else if (prayerKey === 'isha') {
+                        // Isha is after sunset - position after 180° (right side)
+                        const timeAfterSunset = isha - maghrib;
+                        const timeToMidnight = midnight - maghrib;
+                        const progress = timeAfterSunset / timeToMidnight;
+                        return 180 + (progress * 90);
+                    } else if (prayerKey === 'midnight') {
+                        return 270; // Bottom
+                    }
+                    
+                    return 0;
+                }
+                
+                getUpcomingPrayer() {
+                    const now = new Date();
+                    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                    
+                    const prayers = [
+                        { key: 'fajr', minutes: this.prayerTimes.fajr },
+                        { key: 'sunrise', minutes: this.prayerTimes.sunrise },
+                        { key: 'dhuhr', minutes: this.prayerTimes.dhuhr },
+                        { key: 'asr', minutes: this.prayerTimes.asr },
+                        { key: 'maghrib', minutes: this.prayerTimes.maghrib },
+                        { key: 'isha', minutes: this.prayerTimes.isha }
+                    ];
+                    
+                    // Find next prayer
+                    for (const prayer of prayers) {
+                        if (prayer.minutes > currentMinutes) {
+                            const minutesUntil = prayer.minutes - currentMinutes;
+                            return {
+                                key: prayer.key,
+                                minutes: prayer.minutes,
+                                minutesUntil: minutesUntil
+                            };
+                        }
+                    }
+                    
+                    // If no prayer found, next is Fajr (tomorrow)
+                    const fajrTomorrow = this.prayerTimes.fajr + (24 * 60);
+                    const minutesUntil = fajrTomorrow - currentMinutes;
+                    return {
+                        key: 'fajr',
+                        minutes: this.prayerTimes.fajr,
+                        minutesUntil: minutesUntil
+                    };
+                }
+                
+                getMinutesUntilPrayer(prayerMinutes) {
+                    const now = new Date();
+                    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                    const diff = prayerMinutes - currentMinutes;
+                    
+                    if (diff < 0) {
+                        // Prayer has passed, return time until next day's prayer
+                        return diff + (24 * 60);
+                    }
+                    return diff;
+                }
+                
+                draw() {
+                    const ctx = this.ctx;
+                    const width = this.canvas.width;
+                    const height = this.canvas.height;
+                    
+                    // Clear canvas
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    if (!this.prayerTimes.sunrise) return;
+                    
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    // Smaller radius on mobile, limit on very large screens
+                    const isMobile = window.innerWidth < 768;
+                    const isLargeScreen = window.innerWidth > 1600;
+                    const radiusFactor = isMobile ? 0.38 : (isLargeScreen ? 0.42 : 0.48);
+                    const radius = Math.min(width * radiusFactor, height * radiusFactor);
+                    
+                    // Background color will be updated after sun position is calculated
+                    
+                    // Draw full 360° circle (sun path) - PROMINENT BLACK
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Draw horizon line
+                    ctx.strokeStyle = '#b0b0b0';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - radius - 50, centerY);
+                    ctx.lineTo(centerX + radius + 50, centerY);
+                    ctx.stroke();
+                    
+                    // Prayer time colors (matching aladhan.com style)
+                    const prayerColors = {
+                        fajr: '#4A90E2',
+                        sunrise: '#FF6B6B',
+                        dhuhr: '#50C878',
+                        asr: '#FFA500',
+                        maghrib: '#FF1493',
+                        sunset: '#FF6B6B', // Same as sunrise (red/orange)
+                        isha: '#9370DB'
+                    };
+                    
+                    // Get upcoming prayer for highlighting
+                    const upcomingPrayer = this.getUpcomingPrayer();
+                    
+                    // Draw prayer time markers in order: Fajr → Sunrise → Dhuhr → Asr → Maghrib → Sunset → Isha → Midnight
+                    const prayers = [
+                        { name: 'Fajr', key: 'fajr', label: 'Fajr' },
+                        { name: 'Sunrise', key: 'sunrise', label: 'Sunrise' },
+                        { name: 'Dhuhr', key: 'dhuhr', label: 'Dhuhr' },
+                        { name: 'Asr', key: 'asr', label: 'Asr' },
+                        { name: 'Maghrib', key: 'maghrib', label: 'Maghrib' },
+                        { name: 'Sunset', key: 'sunset', label: 'Sunset' },
+                        { name: 'Isha', key: 'isha', label: 'Isha' },
+                        { name: 'Midnight', key: 'midnight', label: 'Midnight' }
+                    ];
+                    
+                    this.prayerPositions = [];
+                    
+                    // Draw prayer markers and labels
+                    prayers.forEach(prayer => {
+                        let minutes;
+                        if (prayer.key === 'midnight') {
+                            minutes = this.midnight;
+                        } else if (prayer.key === 'sunset') {
+                            // Sunset is the same as Maghrib
+                            minutes = this.prayerTimes.maghrib;
+                        } else {
+                            minutes = this.prayerTimes[prayer.key];
+                        }
+                        if (!minutes && prayer.key !== 'midnight' && prayer.key !== 'sunset') {
+                            return;
+                        }
+                        
+                        // For Sunset, offset slightly to avoid overlap with Maghrib
+                        let offsetAngle = 0;
+                        if (prayer.key === 'sunset') {
+                            offsetAngle = 2; // Offset by 2 degrees
+                        }
+                        
+                        let angle = this.getPrayerTimeAngle(prayer.key, minutes);
+                        if (prayer.key === 'sunset') {
+                            angle += offsetAngle; // Slight offset for sunset
+                        }
+                        const pos = this.calculateArcPosition(angle);
+                        const color = prayerColors[prayer.key];
+                        const isUpcoming = upcomingPrayer && upcomingPrayer.key === prayer.key;
+                        
+                        // Store position for hover detection
+                        this.prayerPositions.push({
+                            key: prayer.key,
+                            x: pos.x,
+                            y: pos.y,
+                            minutes: minutes,
+                            label: prayer.label,
+                            color: color,
+                            isUpcoming: isUpcoming
+                        });
+                        
+                        // Calculate label position - place labels further out from circle with connecting line
+                        const labelDistance = radius * 0.28; // Distance from circle edge
+                        const labelRadius = radius + labelDistance;
+                        
+                        // Use the same angle conversion as calculateArcPosition for consistency
+                        let canvasAngle;
+                        if (angle === 90) {
+                            canvasAngle = 270;
+                        } else if (angle === 270) {
+                            canvasAngle = 90;
+                        } else {
+                            canvasAngle = (180 - angle) % 360;
+                            if (canvasAngle < 0) canvasAngle += 360;
+                        }
+                        
+                        const canvasAngleRad = canvasAngle * Math.PI / 180;
+                        const labelX = centerX + Math.cos(canvasAngleRad) * labelRadius;
+                        const labelY = centerY + Math.sin(canvasAngleRad) * labelRadius;
+                        
+                        // Draw connecting line from marker to label
+                        ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(pos.x, pos.y);
+                        ctx.lineTo(labelX, labelY);
+                        ctx.stroke();
+                        
+                        // Draw marker circle
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(pos.x, pos.y, isUpcoming ? 10 : 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = isUpcoming ? '#2d8659' : '#666666';
+                        ctx.lineWidth = isUpcoming ? 3 : 2;
+                        ctx.stroke();
+                        
+                        // Draw label - use dark color, positioned further out
+                        ctx.fillStyle = '#333333';
+                        ctx.font = isUpcoming ? 'bold 13px "Open Sans", sans-serif' : 'bold 12px "Open Sans", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(prayer.label, labelX, labelY - 8);
+                        
+                        // Draw time - positioned below label
+                        ctx.fillStyle = '#666666';
+                        ctx.font = '11px "Open Sans", sans-serif';
+                        ctx.textBaseline = 'top';
+                        ctx.fillText(this.minutesToTime(minutes), labelX, labelY + 4);
+                        
+                        // Draw upcoming prayer annotation
+                        if (isUpcoming) {
+                            const minutesUntil = upcomingPrayer.minutesUntil;
+                            const hours = Math.floor(minutesUntil / 60);
+                            const mins = minutesUntil % 60;
+                            let timeText = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                            
+                            ctx.fillStyle = '#2d8659';
+                            ctx.font = 'bold 11px "Open Sans", sans-serif';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText(`Next: ${timeText}`, labelX, labelY - 22);
+                        }
+                    });
+                    
+                    // Determine sun position: hover position if hovering, otherwise current time position
+                    let sunPos_calc;
+                    let sunAngleForBackground = null;
+                    
+                    if (this.isHovering && this.hoveredArcPosition && this.hoveredAngle !== null) {
+                        // When hovering, use the hover position
+                        sunPos_calc = this.hoveredArcPosition;
+                        sunAngleForBackground = this.hoveredAngle;
+                    } else {
+                        // When not hovering, use current time position
+                        const now = new Date();
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        
+                        // Calculate angle for current time based on Sunrise to Sunset
+                        const sunrise = this.prayerTimes.sunrise;
+                        const dhuhr = this.prayerTimes.dhuhr;
+                        const maghrib = this.prayerTimes.maghrib;
+                        let sunAngle = 0;
+                        
+                        if (currentMinutes >= sunrise && currentMinutes <= maghrib) {
+                            // During day - between sunrise and sunset
+                            if (currentMinutes <= dhuhr) {
+                                // Between sunrise and dhuhr
+                                const progress = (currentMinutes - sunrise) / (dhuhr - sunrise);
+                                sunAngle = progress * 90; // 0° to 90°
+                            } else {
+                                // Between dhuhr and sunset
+                                const progress = (currentMinutes - dhuhr) / (maghrib - dhuhr);
+                                sunAngle = 90 + (progress * 90); // 90° to 180°
+                            }
+                        } else if (currentMinutes < sunrise) {
+                            // Before sunrise
+                            const fajr = this.prayerTimes.fajr;
+                            const midnight = this.midnight || (fajr + (24 * 60 - fajr + maghrib) / 2);
+                            if (currentMinutes >= midnight) {
+                                const progress = (currentMinutes - midnight) / (sunrise - midnight);
+                                sunAngle = -90 + (progress * 90); // -90° to 0°
+                            } else {
+                                // Between midnight (previous day) and fajr
+                                const progress = (currentMinutes + 24 * 60 - midnight) / ((fajr + 24 * 60) - midnight);
+                                sunAngle = -180 + (progress * 90); // -180° to -90°
+                            }
+                        } else {
+                            // After sunset
+                            const isha = this.prayerTimes.isha;
+                            const midnight = this.midnight || (this.prayerTimes.fajr + (24 * 60 - this.prayerTimes.fajr + maghrib) / 2);
+                            if (currentMinutes <= midnight) {
+                                const progress = (currentMinutes - maghrib) / (midnight - maghrib);
+                                sunAngle = 180 + (progress * 90); // 180° to 270°
+                            } else {
+                                // After midnight, before fajr
+                                const fajr = this.prayerTimes.fajr;
+                                const progress = (currentMinutes - midnight) / ((fajr + 24 * 60) - midnight);
+                                sunAngle = 270 + (progress * 90); // 270° to 360°
+                                if (sunAngle >= 360) sunAngle -= 360;
+                            }
+                        }
+                        
+                        sunPos_calc = this.calculateArcPosition(sunAngle);
+                        sunAngleForBackground = sunAngle;
+                    }
+                    
+                    // Draw beaming sun with animation (ALWAYS VISIBLE - this is the interactive element)
+                    if (!sunPos_calc || typeof sunPos_calc.x !== 'number' || typeof sunPos_calc.y !== 'number') {
+                        console.warn('Sun position not calculated, using default position at top of circle');
+                        sunPos_calc = { x: centerX, y: centerY - radius };
+                    }
+                    
+                    // Store current sun position for drag detection
+                    this.currentSunPosition = { x: sunPos_calc.x, y: sunPos_calc.y };
+                    
+                    // Animation frame for pulsing beams (not rotation)
+                    this.animationFrame = (this.animationFrame || 0) + 0.05;
+                    const beamCount = 12;
+                    const sunRadius = 20;
+                    const baseBeamLength = 15;
+                    
+                    // Pulsing animation: beams extend and retract, opacity changes
+                    const pulsePhase = Math.sin(this.animationFrame) * 0.5 + 0.5; // 0 to 1
+                    const beamLength = baseBeamLength + (pulsePhase * 8); // Pulse between 15 and 23
+                    const beamOpacity = 0.6 + (pulsePhase * 0.4); // Pulse between 0.6 and 1.0
+                    
+                    // Only rotate sun when dragging
+                    const rotationAngle = this.isDragging ? this.animationFrame * 2 : 0;
+                    
+                    // Draw more realistic sun with pulsing beams
+                    ctx.save();
+                    ctx.translate(sunPos_calc.x, sunPos_calc.y);
+                    if (this.isDragging) {
+                        ctx.rotate(rotationAngle);
+                    }
+                    
+                    // Draw outer glow layer
+                    const outerGlow = ctx.createRadialGradient(0, 0, sunRadius, 0, 0, sunRadius + beamLength + 5);
+                    outerGlow.addColorStop(0, 'rgba(255, 215, 0, 0)');
+                    outerGlow.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
+                    outerGlow.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                    ctx.fillStyle = outerGlow;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, sunRadius + beamLength + 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw pulsing beams
+                    for (let i = 0; i < beamCount; i++) {
+                        const angle = (i * Math.PI * 2) / beamCount;
+                        const beamAlpha = beamOpacity * (0.8 + Math.sin(this.animationFrame * 2 + i) * 0.2);
+                        ctx.strokeStyle = `rgba(255, 215, 0, ${beamAlpha})`;
+                        ctx.lineWidth = 3;
+                        ctx.lineCap = 'round';
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(angle) * sunRadius, Math.sin(angle) * sunRadius);
+                        ctx.lineTo(Math.cos(angle) * (sunRadius + beamLength), Math.sin(angle) * (sunRadius + beamLength));
+                        ctx.stroke();
+                    }
+                    
+                    ctx.restore();
+                    
+                    // Draw sun core with realistic gradient (brighter center, darker edges)
+                    const gradient = ctx.createRadialGradient(sunPos_calc.x, sunPos_calc.y, 0, sunPos_calc.x, sunPos_calc.y, sunRadius);
+                    gradient.addColorStop(0, '#FFF8DC'); // Very bright center
+                    gradient.addColorStop(0.3, '#FFD700'); // Gold
+                    gradient.addColorStop(0.6, '#FFA500'); // Orange
+                    gradient.addColorStop(0.9, '#FF8C00'); // Dark orange
+                    gradient.addColorStop(1, '#FF6347'); // Tomato red at edge
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(sunPos_calc.x, sunPos_calc.y, sunRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Sun outline - subtle
+                    ctx.strokeStyle = '#FF8C00';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Add strong glow effect
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(sunPos_calc.x, sunPos_calc.y, sunRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    
+                    // Update background color based on sun position (always update)
+                    this.updateBackgroundColor(sunAngleForBackground);
+                    
+                    // Horizontal line labels removed - Sunrise and Sunset are now prayer markers
+                    
+                    // Sun is now the interactive element - no separate circle needed
+                }
+                
+                startAnimation() {
+                    if (this.animationId) {
+                        cancelAnimationFrame(this.animationId);
+                    }
+                    
+                    const animate = () => {
+                        this.draw();
+                        this.animationId = requestAnimationFrame(animate);
+                    };
+                    
+                    animate();
+                }
+            }
+            
+            // Initialize when page loads
+            document.addEventListener('DOMContentLoaded', async () => {
+                const visualization = new PrayerArcVisualization();
+                
+                // Start loading prayer times immediately (getLocation is non-blocking now)
+                visualization.getLocation().then(() => {
+                    // Load prayer times immediately with default location
+                    visualization.loadPrayerTimes();
+                });
+                
+                // Update every minute
+                setInterval(() => {
+                    visualization.draw();
+                }, 60000);
+                
+                // Hide preloader
+                if (document.getElementById('preloader')) {
+                    document.getElementById('preloader').style.display = 'none';
+                }
+            });
+        </script>
+    </body>
+</html>
+

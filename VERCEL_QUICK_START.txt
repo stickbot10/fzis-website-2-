@@ -1,0 +1,28 @@
+VERCEL DEPLOYMENT - QUICK START
+================================
+
+✅ Files Created:
+- api/create-donation-checkout.js
+- api/create-enrollment-checkout.js  
+- api/verify-session.js
+- vercel.json
+- Frontend updated to use /api/ prefix
+
+NEXT STEPS:
+===========
+
+1. Set Environment Variable in Vercel:
+   - Go to: Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Add: STRIPE_SECRET_KEY = sk_test_51SZrESH61BLdlliV0qEnUvkXpzcoeCUB6UQ6GYdGjtJSXIUJxI5bMjxw0vofdu5JquIKkqSLNvVMDuV4tyAiSo0G00gq2k44wj
+   - Select all environments (Production, Preview, Development)
+
+2. Deploy:
+   - If connected via Git: Just push your changes
+   - Or run: vercel --prod
+
+3. Test:
+   - Visit: https://your-domain.vercel.app/donate.html
+   - Visit: https://your-domain.vercel.app/payment.html
+
+That's it! Your Stripe payments will work on Vercel. 🚀
+

@@ -3,12 +3,12 @@
     <head>
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <title>Starter Page - Mentor Bootstrap Template</title>
+        <title>Thank You - Fatima Zahra Islamic School</title>
         <meta name="description" content="">
         <meta name="keywords" content="">
         <!-- Favicons -->
-        <link href="assets/img/favicon.png" rel="icon">
-        <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <link href="assets/img/FZIS logo.png" rel="icon">
+        <link href="assets/img/FZIS logo.png" rel="apple-touch-icon">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -32,53 +32,33 @@
     <body class="starter-page-page">
         <header id="header" class="header d-flex align-items-center sticky-top">
             <div class="container-fluid container-xl position-relative d-flex align-items-center">
-                <a href="index.html" class="logo d-flex align-items-center me-auto"> <!-- Uncomment the line below if you also wish to use an image logo --> <!-- <img src="assets/img/logo.png" alt=""> --> <h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
+                <a href="index.html" class="logo d-flex align-items-center me-auto"> <img src="assets/img/FZIS logo.png" alt="FZIS logo" style="height: 60px; margin-right: 10px;"><h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
                 <nav id="navmenu" class="navmenu">
                     <ul>
                         <li><a href="index.html">Home<br></a>
                         </li>
                         <li><a href="about.html">About</a>
                         </li>
-                        <li><a href="courses.html">Courses</a>
-                        </li>
-                        <li><a href="trainers.html">Trainers</a>
+                        <li><a href="trainers.html">Teachers</a>
                         </li>
                         <li><a href="events.html">Events</a>
                         </li>
-                        <li><a href="pricing.html">Pricing</a>
-                        </li>
-                        <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <li class="dropdown"><a href="gallery.html"><span>Gallery</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
-                                <li><a href="#">Dropdown 1</a>
+                                <li><a href="gallery-photos.html">Photos</a>
                                 </li>
-                                <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                    <ul>
-                                        <li><a href="#">Deep Dropdown 1</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 2</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 3</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 4</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 5</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Dropdown 2</a>
-                                </li>
-                                <li><a href="#">Dropdown 3</a>
-                                </li>
-                                <li><a href="#">Dropdown 4</a>
+                                <li><a href="gallery-videos.html">Videos</a>
                                 </li>
                             </ul>
+                        </li>
+                        <li><a href="pricing.html">Pricing</a>
                         </li>
                         <li><a href="contact.html">Contact</a>
                         </li>
                     </ul>
                     <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
                 </nav>
-                <a class="btn-getstarted" href="courses.html">Donate</a><a class="btn-getstarted" href="courses.html">Get Started</a>
+                <a class="btn-getstarted" href="donate.html">Donate</a><a class="btn-getstarted" href="registrations.html">Register</a><a class="btn-getstarted btn-login" href="#" onclick="alert('Portal URL will be added soon'); return false;">Login</a>
             </div>
         </header>
         <main class="main">
@@ -98,20 +78,79 @@
                         <ol>
                             <li><a href="index.html">Home</a>
                             </li>
-                            <li class="current">Thanks</li>
+                            <li class="current">Thank You</li>
                         </ol>
                     </div>
                 </nav>
             </div>
             <!-- End Page Title -->
-            <!-- Starter Section Section -->
-            <section id="starter-section" class="starter-section section">
-                <!-- End Section Title -->
+            <!-- Thank You Section -->
+            <section id="thank-you" class="thank-you section">
                 <div class="container" data-aos="fade-up">
-                    <p>Thank you for registering to our school. We'll review your registration. If a spot is available, we’ll contact you with payment instructions (within [number] buisness days). If you have any other questions or issues, please call (phone number).</p>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 text-center">
+                            <div class="thank-you-icon mb-4">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                            </div>
+                            <div id="donation-thank-you" style="display: none;">
+                                <h2>Thank You for Your Generous Donation!</h2>
+                                <p class="lead">We sincerely appreciate your support of Fatima Zahra Islamic School.</p>
+                                <p>Your donation of $<span id="donation-amount"></span> will help us continue providing quality Islamic education to our students.</p>
+                                <p>A receipt for your donation has been sent to your email. If you don't see it, please check your spam folder.</p>
+                                <p>May Allah (SWT) reward you abundantly for your generosity. JazakAllah Khair!</p>
+                                <a href="index.html" class="btn btn-primary mt-3">Return to Home</a>
+                            </div>
+                            <div id="registration-thank-you" style="display: none;">
+                                <h2>Thank You for Registering!</h2>
+                                <p class="lead">We've received your registration for Fatima Zahra Islamic School.</p>
+                                <p>We'll review your registration and contact you with further instructions within 3-5 business days if a spot is available.</p>
+                                <p>If you have any questions, please don't hesitate to <a href="contact.html">contact us</a>.</p>
+                                <a href="index.html" class="btn btn-primary mt-3">Return to Home</a>
+                            </div>
+                            <div id="enrollment-thank-you" style="display: none;">
+                                <h2>Thank You for Your Enrollment Payment!</h2>
+                                <p class="lead">Your payment has been successfully processed.</p>
+                                <p>Your enrollment fee of $<span id="enrollment-amount"></span> AUD has been received.</p>
+                                <p>You will receive a confirmation email shortly with your enrollment details and next steps.</p>
+                                <p>If you have any questions, please don't hesitate to <a href="contact.html">contact us</a>.</p>
+                                <p>May Allah (SWT) bless your journey of learning. JazakAllah Khair!</p>
+                                <a href="index.html" class="btn btn-primary mt-3">Return to Home</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
-            <!-- /Starter Section Section -->
+
+            <script>
+            // Check URL parameters to determine which thank you message to show
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const type = urlParams.get('type');
+                const amount = urlParams.get('amount');
+                const name = urlParams.get('name');
+                const sessionId = urlParams.get('session_id');
+                
+                if (type === 'donation') {
+                    document.getElementById('donation-thank-you').style.display = 'block';
+                    if (amount) {
+                        document.getElementById('donation-amount').textContent = amount;
+                    }
+                    if (name) {
+                        // Update the page title for donations
+                        document.title = 'Thank You for Your Donation - Fatima Zahra Islamic School';
+                    }
+                } else if (type === 'enrollment') {
+                    document.getElementById('enrollment-thank-you').style.display = 'block';
+                    if (amount) {
+                        document.getElementById('enrollment-amount').textContent = amount;
+                    }
+                    document.title = 'Thank You for Your Enrollment - Fatima Zahra Islamic School';
+                } else {
+                    document.getElementById('registration-thank-you').style.display = 'block';
+                    document.title = 'Thank You for Registering - Fatima Zahra Islamic School';
+                }
+            });
+            </script>
         </main>
         <footer id="footer" class="footer position-relative light-background">
             <div class="container footer-top">
@@ -133,30 +172,26 @@
                     <div class="col-lg-2 col-md-3 footer-links">
                         <h4>Useful Links</h4>
                         <ul>
-                            <li><a href="#">Home</a>
+                            <li><a href="index.html">Home</a>
                             </li>
-                            <li><a href="#">About us</a>
+                            <li><a href="about.html">About us</a>
                             </li>
-                            <li><a href="#">Services</a>
+                            <li><a href="trainers.html">Teachers</a>
                             </li>
-                            <li><a href="#">Terms of service</a>
+                            <li><a href="events.html">Events</a>
                             </li>
-                            <li><a href="#">Privacy policy</a>
+                            <li><a href="contact.html">Contact</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-lg-2 col-md-3 footer-links">
-                        <h4>Our Services</h4>
+                        <h4>Quick Links</h4>
                         <ul>
-                            <li><a href="#">Web Design</a>
+                            <li><a href="registrations.html">Register</a>
                             </li>
-                            <li><a href="#">Web Development</a>
+                            <li><a href="pricing.html">Pricing</a>
                             </li>
-                            <li><a href="#">Product Management</a>
-                            </li>
-                            <li><a href="#">Marketing</a>
-                            </li>
-                            <li><a href="#">Graphic Design</a>
+                            <li><a href="donate.html">Donate</a>
                             </li>
                         </ul>
                     </div>

@@ -3,16 +3,15 @@
     <head>
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <title>Pricing - Mentor Bootstrap Template</title>
+        <title>Donate - Fatima Zahra Islamic School</title>
         <meta name="description" content="">
         <meta name="keywords" content="">
         <!-- Favicons -->
-        <link href="assets/img/favicon.png" rel="icon">
-        <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <link href="assets/img/FZIS logo.png" rel="icon">
+        <link href="assets/img/FZIS logo.png" rel="apple-touch-icon">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com" rel="preconnect">
         <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-        <link href="react-paypal-button-v2-master/css/theme.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
         <!-- Vendor CSS Files -->
         <link href="../bootstrap_theme/bootstrap.css" rel="stylesheet" type="text/css">
@@ -29,56 +28,39 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
-        <script src="https://www.paypal.com/sdk/js?client-id=AUx-whyiZGhpfs4TXHrDcWe5t5q2Sn9vA-qOnz3g832SkRkAmWOwx22L3geaKEpSJxBrx1E_T9y1CqqY&currency=AUD"></script>
+        <script src="https://js.stripe.com/v3/"></script>
     </head>
     <body class="payment-page">
         <header id="header" class="header d-flex align-items-center sticky-top">
-            <div class="container-fluid container-xl position-relative d-flex align-items-center"><a href="index.html" class="logo d-flex align-items-center me-auto"> <!-- Uncomment the line below if you also wish to use an image logo --> <!-- <img src="assets/img/logo.png" alt=""> --> <img src="assets/img/FZIS logo.png" alt="FZIS logo"><h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
+            <div class="container-fluid container-xl position-relative d-flex align-items-center"><a href="index.html" class="logo d-flex align-items-center me-auto"> <img src="assets/img/FZIS logo.png" alt="FZIS logo" style="height: 60px; margin-right: 10px;"><h1 class="sitename">FATIMA ZAHRA ISLAMIC SCHOOL</h1> </a>
                 <nav id="navmenu" class="navmenu">
                     <ul>
                         <li><a href="index.html">Home<br></a>
                         </li>
                         <li><a href="about.html">About</a>
                         </li>
-                        <li><a href="courses.html">Courses</a>
-                        </li>
-                        <li><a href="trainers.html">Trainers</a>
+                        <li><a href="trainers.html">Teachers</a>
                         </li>
                         <li><a href="events.html">Events</a>
                         </li>
-                        <li><a href="pricing.html" class="active">Pricing</a>
+                        <li><a href="prayer-arc.html">Prayer Arc</a>
                         </li>
-                        <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                        <li class="dropdown"><a href="gallery.html"><span>Gallery</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                             <ul>
-                                <li><a href="#">Dropdown 1</a>
+                                <li><a href="gallery-photos.html">Photos</a>
                                 </li>
-                                <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                    <ul>
-                                        <li><a href="#">Deep Dropdown 1</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 2</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 3</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 4</a>
-                                        </li>
-                                        <li><a href="#">Deep Dropdown 5</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Dropdown 2</a>
-                                </li>
-                                <li><a href="#">Dropdown 3</a>
-                                </li>
-                                <li><a href="#">Dropdown 4</a>
+                                <li><a href="gallery-videos.html">Videos</a>
                                 </li>
                             </ul>
+                        </li>
+                        <li><a href="pricing.html">Pricing</a>
                         </li>
                         <li><a href="contact.html">Contact</a>
                         </li>
                     </ul>
                     <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
                 </nav>
+                <a class="btn-getstarted" href="donate.html">Donate</a><a class="btn-getstarted" href="registrations.html">Register</a><a class="btn-getstarted btn-login" href="#" onclick="alert('Portal URL will be added soon'); return false;">Login</a>
             </div>
         </header>
         <main class="main">
@@ -107,35 +89,88 @@
             <!-- Pricing Section -->
             <section id="pricing" class="pricing section">
                 <div class="container">
-                    <div id="paypal-button-container" style="text-align: center; margin-top: 30px;">
-                        <script>
-                        paypal.Buttons({
-                            style: {
-                            layout: 'vertical',
-                            color:  'blue',
-                            shape:  'rect',
-                            label:  'paypal'
-                            },
-                            createOrder: function(data, actions) {
-                            return actions.order.create({
-                                purchase_units: [{
-                                amount: {
-                                    value: '1.00' // Change this to your amount
-                                }
-                                }]
-                            });
-                            },
-                            onApprove: function(data, actions) {
-                            return actions.order.capture().then(function(details) {
-                                alert('Transaction completed by ' + details.payer.name.given_name);
-                            });
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <h2 class="text-center mb-4">Support Fatima Zahra Islamic School</h2>
+                            <p class="text-center mb-4">Your generous donations help us continue providing quality Islamic education to our students. All donations are greatly appreciated.</p>
+                            <div class="donation-form" style="max-width: 500px; margin: 30px auto; text-align: center;">
+                                <div class="mb-4">
+                                    <label for="donation-amount" class="form-label">Enter Donation Amount (AUD)</label>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="donation-amount" min="1" step="0.01" value="50.00" style="text-align: center; font-weight: bold;">
+                                    </div>
+                                </div>
+                                <button id="stripe-donate-button" class="btn btn-primary btn-lg w-100" style="margin-top: 20px; padding: 15px; font-size: 18px;">
+                                    <i class="bi bi-credit-card me-2"></i>Donate with Stripe
+                                </button>
+                                <p class="text-muted mt-3">Secure payment processed by Stripe</p>
+                                <div id="loading-spinner" style="display: none; text-align: center; margin-top: 20px;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Processing your donation...</p>
+                                </div>
+                            </div>
+
+                            <script>
+                            // Get the donation amount from the input field
+                            function getDonationAmount() {
+                                const amount = document.getElementById('donation-amount').value;
+                                // Ensure minimum donation of $1
+                                return Math.max(parseFloat(amount) || 1, 1).toFixed(2);
                             }
-                        }).render('#paypal-button-container');
-                        </script>
+
+                            // Stripe payment handler
+                            document.getElementById('stripe-donate-button').addEventListener('click', async function() {
+                                const button = this;
+                                const spinner = document.getElementById('loading-spinner');
+                                const amount = getDonationAmount();
+                                
+                                // Disable button and show loading
+                                button.disabled = true;
+                                button.style.display = 'none';
+                                spinner.style.display = 'block';
+
+                                try {
+                                    // Get the base URL (works for both localhost and production)
+                                    const baseUrl = window.location.origin;
+                                    
+                                    // Create checkout session
+                                    const response = await fetch(`${baseUrl}/api/create-donation-checkout`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            amount: amount,
+                                            currency: 'aud'
+                                        })
+                                    });
+
+                                    const data = await response.json();
+
+                                    if (data.error) {
+                                        throw new Error(data.error);
+                                    }
+
+                                    // Redirect to Stripe Checkout
+                                    if (data.url) {
+                                        window.location.href = data.url;
+                                    } else {
+                                        throw new Error('No checkout URL received');
+                                    }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    alert('There was an error processing your donation. Please try again.');
+                                    button.disabled = false;
+                                    button.style.display = 'block';
+                                    spinner.style.display = 'none';
+                                }
+                            });
+                            </script>
+                        </div>
                     </div>
-                    <p>MIT License <br>
-                    Copyright (c) 2019 Lue Hang <br>
-                    ... </p>
                 </div>
             </section>
             <!-- /Pricing Section -->
