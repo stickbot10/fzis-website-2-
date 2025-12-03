@@ -101,79 +101,175 @@
                         <div class="col-lg-8">
                             <h2 class="text-center mb-4">Confirm and Pay</h2>
                             <p class="text-center mb-4">Complete your payment securely through Stripe</p>
-                            <div class="payment-summary" style="max-width: 500px; margin: 30px auto; text-align: center;">
+                            <div class="payment-summary" style="max-width: 600px; margin: 30px auto;">
                                 <div class="card mb-4">
-                                    <div class="card-body">
+                                    <div class="card-body text-center">
                                         <h5 class="card-title">Annual Enrollment Fee</h5>
                                         <h3 class="text-primary mb-3">$300.00 AUD</h3>
                                         <p class="text-muted mb-0">Complete Islamic education package for one year</p>
                                     </div>
                                 </div>
-                                <button id="stripe-payment-button" class="btn btn-primary btn-lg w-100" style="padding: 15px; font-size: 18px;">
-                                    <i class="bi bi-credit-card me-2"></i>Pay with Stripe
-                                </button>
-                                <p class="text-muted mt-3">Secure payment processed by Stripe</p>
-                                <div id="loading-spinner" style="display: none; text-align: center; margin-top: 20px;">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
+                                
+                                <!-- Stripe Payment Form -->
+                                <div id="payment-form-container" style="display: none; margin-top: 30px;">
+                                    <div class="card" style="padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <h5 class="mb-4">Payment Details</h5>
+                                        <form id="payment-form">
+                                            <div class="mb-3">
+                                                <label for="card-element" class="form-label">Card Information</label>
+                                                <div id="card-element" style="padding: 10px; border: 1px solid #ced4da; border-radius: 4px; background: white;">
+                                                    <!-- Stripe Elements will create form elements here -->
+                                                </div>
+                                                <div id="card-errors" role="alert" style="color: #dc3545; margin-top: 8px; font-size: 14px;"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" placeholder="email@example.com" required>
+                                            </div>
+                                            
+                                            <button type="submit" id="submit-button" class="btn btn-primary w-100" style="padding: 12px; font-size: 16px; background: var(--accent-color); border: none;">
+                                                <span id="button-text">Pay $300.00</span>
+                                                <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display: none;"></span>
+                                            </button>
+                                        </form>
+                                        <p class="text-muted mt-3 mb-0" style="font-size: 12px; text-align: center;">
+                                            <i class="bi bi-shield-check me-1"></i>Secure payment processed by Stripe
+                                        </p>
                                     </div>
-                                    <p class="mt-2">Processing your payment...</p>
                                 </div>
+                                
+                                <button id="show-payment-form-button" class="btn btn-primary btn-lg w-100" style="padding: 15px; font-size: 18px; background: var(--accent-color); border: none;">
+                                    <i class="bi bi-credit-card me-2"></i>Continue to Payment
+                                </button>
                             </div>
                             
                             <script>
-                            // Stripe payment handler for enrollment
-                            document.getElementById('stripe-payment-button').addEventListener('click', async function() {
+                            // Initialize Stripe
+                            let stripe, elements, cardElement, paymentIntentClientSecret;
+                            
+                            // Show payment form button handler
+                            document.getElementById('show-payment-form-button').addEventListener('click', async function() {
                                 const button = this;
-                                const spinner = document.getElementById('loading-spinner');
+                                const formContainer = document.getElementById('payment-form-container');
                                 
-                                // Disable button and show loading
                                 button.disabled = true;
-                                button.style.display = 'none';
-                                spinner.style.display = 'block';
-
+                                button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+                                
                                 try {
-                                    // Get the base URL (works for both localhost and production)
                                     const baseUrl = window.location.origin;
                                     
-                                    // Create checkout session
-                                    const response = await fetch(`${baseUrl}/api/create-enrollment-checkout`, {
+                                    // Create payment intent
+                                    const response = await fetch(`${baseUrl}/api/create-payment-intent`, {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
                                             amount: '300.00',
-                                            currency: 'aud'
+                                            currency: 'aud',
+                                            type: 'enrollment'
                                         })
                                     });
-
-                                    // Check if response is OK
+                                    
                                     if (!response.ok) {
                                         const errorText = await response.text();
                                         throw new Error(`Server error: ${response.status} - ${errorText}`);
                                     }
-
+                                    
                                     const data = await response.json();
-
+                                    
                                     if (data.error) {
                                         throw new Error(data.error);
                                     }
-
-                                    // Redirect to Stripe Checkout
-                                    if (data.url) {
-                                        window.location.href = data.url;
-                                    } else {
-                                        throw new Error('No checkout URL received');
-                                    }
+                                    
+                                    // Get publishable key from server
+                                    const keyResponse = await fetch(`${baseUrl}/api/get-publishable-key`);
+                                    const keyData = await keyResponse.json();
+                                    const publishableKey = keyData.publishableKey || 'pk_test_51SZrESH61BLdlliV0qEnUvkXpzcoeCUB6UQ6GYdGjtJSXIUJxI5bMjxw0vofdu5JquIKkqSLNvVMDuV4tyAiSo0G00gq2k44wj';
+                                    
+                                    // Initialize Stripe
+                                    stripe = Stripe(publishableKey);
+                                    elements = stripe.elements();
+                                    
+                                    paymentIntentClientSecret = data.clientSecret;
+                                    
+                                    // Create card element
+                                    const cardOptions = {
+                                        style: {
+                                            base: {
+                                                fontSize: '16px',
+                                                color: '#424770',
+                                                '::placeholder': {
+                                                    color: '#aab7c4',
+                                                },
+                                            },
+                                            invalid: {
+                                                color: '#9e2146',
+                                            },
+                                        },
+                                    };
+                                    
+                                    cardElement = elements.create('card', cardOptions);
+                                    cardElement.mount('#card-element');
+                                    
+                                    cardElement.on('change', function(event) {
+                                        const displayError = document.getElementById('card-errors');
+                                        if (event.error) {
+                                            displayError.textContent = event.error.message;
+                                        } else {
+                                            displayError.textContent = '';
+                                        }
+                                    });
+                                    
+                                    // Show form and hide button
+                                    formContainer.style.display = 'block';
+                                    button.style.display = 'none';
+                                    
                                 } catch (error) {
                                     console.error('Error:', error);
-                                    alert('There was an error processing your payment: ' + error.message + '\n\nPlease check the browser console for details.');
+                                    alert('There was an error: ' + error.message);
                                     button.disabled = false;
-                                    button.style.display = 'block';
-                                    spinner.style.display = 'none';
+                                    button.innerHTML = '<i class="bi bi-credit-card me-2"></i>Continue to Payment';
                                 }
                             });
+                            
+                            // Handle form submission
+                            const paymentForm = document.getElementById('payment-form');
+                            if (paymentForm) {
+                                paymentForm.addEventListener('submit', async function(event) {
+                                    event.preventDefault();
+                                    
+                                    const submitButton = document.getElementById('submit-button');
+                                    const buttonText = document.getElementById('button-text');
+                                    const spinner = document.getElementById('spinner');
+                                    
+                                    submitButton.disabled = true;
+                                    buttonText.style.display = 'none';
+                                    spinner.style.display = 'inline-block';
+                                    
+                                    const {error, paymentIntent} = await stripe.confirmCardPayment(paymentIntentClientSecret, {
+                                        payment_method: {
+                                            card: cardElement,
+                                            billing_details: {
+                                                email: document.getElementById('email').value,
+                                            },
+                                        }
+                                    });
+                                    
+                                    if (error) {
+                                        // Show error to customer
+                                        const displayError = document.getElementById('card-errors');
+                                        displayError.textContent = error.message;
+                                        submitButton.disabled = false;
+                                        buttonText.style.display = 'inline';
+                                        spinner.style.display = 'none';
+                                    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                                        // Payment succeeded
+                                        window.location.href = 'thanks.html?type=enrollment&amount=300.00';
+                                    }
+                                });
+                            }
                             </script>
                         </div>
                     </div>
