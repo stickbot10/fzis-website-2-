@@ -131,14 +131,17 @@
                                     </div>
                                 </div>
                                 
-                                <button id="show-payment-form-button" class="btn btn-primary btn-lg w-100" style="margin-top: 20px; padding: 15px; font-size: 18px; background: var(--accent-color); border: none;">
+                                <button type="button" id="show-payment-form-button" class="btn btn-primary btn-lg w-100" style="margin-top: 20px; padding: 15px; font-size: 18px; background: var(--accent-color); border: none;">
                                     <i class="bi bi-credit-card me-2"></i>Continue to Payment
                                 </button>
                             </div>
 
                             <script>
-                            // Initialize Stripe (you'll need to get your publishable key from Vercel env or hardcode for now)
-                            // For now, we'll fetch it from the server or use a placeholder
+                            // Wait for DOM to be ready
+                            document.addEventListener('DOMContentLoaded', function() {
+                            console.log('DOM loaded, initializing payment form...');
+                            
+                            // Initialize Stripe
                             let stripe, elements, cardElement, paymentIntentClientSecret;
                             
                             // Get the donation amount from the input field
@@ -148,16 +151,28 @@
                             }
                             
                             // Update amount display when donation amount changes
-                            document.getElementById('donation-amount').addEventListener('input', function() {
-                                const amount = getDonationAmount();
-                                const amountDisplay = document.getElementById('amount-display');
-                                if (amountDisplay) {
-                                    amountDisplay.textContent = amount;
-                                }
-                            });
+                            const donationAmountInput = document.getElementById('donation-amount');
+                            if (donationAmountInput) {
+                                donationAmountInput.addEventListener('input', function() {
+                                    const amount = getDonationAmount();
+                                    const amountDisplay = document.getElementById('amount-display');
+                                    if (amountDisplay) {
+                                        amountDisplay.textContent = amount;
+                                    }
+                                });
+                            }
                             
                             // Show payment form button handler
-                            document.getElementById('show-payment-form-button').addEventListener('click', async function() {
+                            const showPaymentButton = document.getElementById('show-payment-form-button');
+                            if (!showPaymentButton) {
+                                console.error('Show payment button not found!');
+                                return;
+                            }
+                            
+                            showPaymentButton.addEventListener('click', async function(event) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                console.log('Continue to Payment button clicked');
                                 const button = this;
                                 const formContainer = document.getElementById('payment-form-container');
                                 const amount = getDonationAmount();
@@ -246,6 +261,7 @@
                             // Handle form submission
                             const paymentForm = document.getElementById('payment-form');
                             if (paymentForm) {
+                                console.log('Payment form found, attaching submit handler');
                                 paymentForm.addEventListener('submit', async function(event) {
                                     event.preventDefault();
                                     
@@ -275,11 +291,15 @@
                                         spinner.style.display = 'none';
                                     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
                                         // Payment succeeded
+                                        console.log('Payment succeeded!');
                                         const amount = getDonationAmount();
                                         window.location.href = `thanks.html?type=donation&amount=${amount}`;
                                     }
                                 });
+                            } else {
+                                console.error('Payment form not found!');
                             }
+                            }); // End DOMContentLoaded
                             </script>
                         </div>
                     </div>
