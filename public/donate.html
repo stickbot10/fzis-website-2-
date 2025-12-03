@@ -148,6 +148,12 @@
                                         })
                                     });
 
+                                    // Check if response is OK
+                                    if (!response.ok) {
+                                        const errorText = await response.text();
+                                        throw new Error(`Server error: ${response.status} - ${errorText}`);
+                                    }
+
                                     const data = await response.json();
 
                                     if (data.error) {
@@ -162,7 +168,7 @@
                                     }
                                 } catch (error) {
                                     console.error('Error:', error);
-                                    alert('There was an error processing your donation. Please try again.');
+                                    alert('There was an error processing your donation: ' + error.message + '\n\nPlease check the browser console for details.');
                                     button.disabled = false;
                                     button.style.display = 'block';
                                     spinner.style.display = 'none';
