@@ -1,4 +1,10 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  console.error('STRIPE_SECRET_KEY environment variable is not set!');
+}
+
+const stripe = require('stripe')(stripeSecretKey);
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -14,6 +20,14 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check if Stripe key is configured
+  if (!stripeSecretKey) {
+    console.error('STRIPE_SECRET_KEY is missing from environment variables');
+    return res.status(500).json({ 
+      error: 'Server configuration error: Stripe secret key is not configured. Please set STRIPE_SECRET_KEY in Vercel environment variables.' 
+    });
   }
 
   try {
