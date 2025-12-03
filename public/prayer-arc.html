@@ -26,26 +26,26 @@
             .prayer-arc-container {
                 background: linear-gradient(to bottom, #0a0e27 0%, #1a1f3a 50%, #2a2f4a 100%);
                 min-height: 100vh;
-                padding: 100px 20px 40px;
+                padding: 90px 16px 40px;
                 position: relative;
                 overflow-x: hidden;
-                transition: background 1s ease;
             }
-            
+
+            /* Card that holds the arc + tooltips */
             .arc-canvas-wrapper {
                 position: relative;
                 width: 100%;
-                max-width: 900px;
-                margin: 40px auto;
-                padding: 20px;
+                max-width: 720px;
+                margin: 24px auto 32px;
+                padding: 18px;
                 background: #ffffff;
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.12);
             }
             
+            /* Canvas always keeps a nice square-ish shape */
             #sunArcCanvas {
                 width: 100%;
-                height: auto;
                 display: block;
                 background: transparent;
                 cursor: crosshair;
@@ -180,6 +180,17 @@
                 max-width: 600px;
             }
             
+            /* Desktop: give it a bit more breathing room */
+            @media (min-width: 992px) {
+                .prayer-arc-container {
+                    padding-top: 110px;
+                }
+                .arc-canvas-wrapper {
+                    max-width: 780px;
+                    padding: 24px 28px;
+                }
+            }
+
             @media (max-width: 768px) {
                 .prayer-arc-container {
                     padding: 80px 10px 20px;
@@ -662,29 +673,31 @@
                     if (!isDragging && !this.isDragging) {
                         // Not dragging - just handle tooltips for prayer markers (desktop hover)
                         let hoveredPrayer = null;
-                        const prayerHoverRadius = 20;
-                        
+
+                        // Smaller radius so you really have to be on the circle, not far away
+                        const prayerHoverRadius = 10;
+
                         for (const prayer of this.prayerPositions) {
                             const dx = x - prayer.x;
                             const dy = y - prayer.y;
                             const distance = Math.sqrt(dx * dx + dy * dy);
-                            
+
                             if (distance < prayerHoverRadius) {
                                 hoveredPrayer = prayer;
                                 break;
                             }
                         }
-                        
+
                         if (hoveredPrayer) {
                             this.hoveredPrayer = hoveredPrayer;
-                            this.showPrayerTooltip(hoveredPrayer, x, y);
+                            // Use the marker position so tooltip is anchored to the circle
+                            this.showPrayerTooltip(hoveredPrayer, hoveredPrayer.x, hoveredPrayer.y);
                         } else {
                             this.hoveredPrayer = null;
                             this.hideTooltips();
                         }
                         return; // Don't move sun if not dragging
                     }
-                    
                     // Dragging the sun - get angle from position and move sun there
                     const angle = this.getAngleFromPoint(x, y);
                     
@@ -732,27 +745,34 @@
                     const minutesUntil = this.getMinutesUntilPrayer(prayer.minutes);
                     const hours = Math.floor(minutesUntil / 60);
                     const mins = minutesUntil % 60;
+
                     let timeText;
                     if (hours > 0) {
                         timeText = `${hours}h ${mins}m`;
                     } else {
                         timeText = `${mins}m`;
                     }
-                    
+
                     this.prayerTooltip.innerHTML = `
                         <strong>${prayer.label}</strong><br>
                         ${this.minutesToTime(prayer.minutes)}<br>
                         <span style="color: #2d8659;">${timeText} until</span>
                     `;
+
+                    // x, y here are the circle centre in canvas coordinates
+                    const offsetX = 14;
+                    const offsetY = -12;
+
                     this.prayerTooltip.style.display = 'block';
-                    this.prayerTooltip.style.left = (x + 15) + 'px';
-                    this.prayerTooltip.style.top = (y - 10) + 'px';
-                    
-                    // Adjust if tooltip goes off screen
+                    this.prayerTooltip.style.left = (x + offsetX) + 'px';
+                    this.prayerTooltip.style.top = (y + offsetY) + 'px';
+
+                    // Keep the tooltip inside the canvas wrapper
                     const rect = this.prayerTooltip.getBoundingClientRect();
                     const canvasRect = this.canvas.getBoundingClientRect();
+
                     if (rect.right > canvasRect.right) {
-                        this.prayerTooltip.style.left = (x - rect.width - 15) + 'px';
+                        this.prayerTooltip.style.left = (x - rect.width - offsetX) + 'px';
                     }
                     if (rect.top < canvasRect.top) {
                         this.prayerTooltip.style.top = (y + 20) + 'px';
