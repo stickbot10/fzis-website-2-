@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Firebase Hosting Template",
   "scripts": {
-    "build": "mkdir -p dist && cp -r public/* dist/",
+    "build": "echo 'Build skipped for Vercel' || true",
     "deploy": "firebase deploy",
     "serve": "firebase serve",
     "start": "node server.js",
