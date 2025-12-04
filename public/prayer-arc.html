@@ -517,12 +517,16 @@
                         const x = e.clientX - rect.left;
                         const y = e.clientY - rect.top;
                         
-                        if (this.isPointOnSun(x, y)) {
+                        // Check if clicking on sun (must have current position set)
+                        if (this.currentSunPosition && this.isPointOnSun(x, y)) {
                             this.isDragging = true;
-                            // Start dragging the sun
+                            // Start dragging - get angle from mouse position
                             const angle = this.getAngleFromPoint(x, y);
                             if (angle !== null) {
                                 this.handleInteraction(x, y, true);
+                            } else {
+                                // Even if not exactly on arc, start dragging from sun's current angle
+                                this.isDragging = true;
                             }
                         }
                     });
@@ -534,7 +538,7 @@
                         const y = e.clientY - rect.top;
                         
                         if (this.isDragging) {
-                            // Dragging the sun - follow mouse
+                            // Dragging the sun - follow mouse (even if not exactly on arc)
                             this.handleInteraction(x, y, true);
                         } else {
                             // Not dragging - just check for prayer markers (no sun movement, no tooltip on circle)
@@ -600,34 +604,28 @@
                             this.isHovering = false;
                             this.showPrayerTooltip(touchedPrayer, x, y);
                             this.draw(); // Return sun to current time
-                        } else {
-                            // Check if touching the circle (not just the sun)
-                            const angle = this.getAngleFromPoint(x, y);
-                            if (angle !== null) {
-                                // Touched the circle - show time tooltip
-                                this.hoveredAngle = angle;
-                                this.hoveredPrayer = null;
-                                this.isHovering = true;
-                                const pos = this.calculateArcPosition(angle);
-                                this.hoveredArcPosition = pos;
-                                this.showTimeTooltip(angle, x, y);
-                                this.draw();
-                            } else if (this.isPointOnSun(x, y)) {
-                                // Touched the sun - start dragging
-                                this.isDragging = true;
-                                const sunAngle = this.getAngleFromPoint(x, y);
-                                if (sunAngle !== null) {
-                                    this.handleInteraction(x, y, true);
-                                }
+                        } else if (this.currentSunPosition && this.isPointOnSun(x, y)) {
+                            // Touched the sun - start dragging
+                            this.isDragging = true;
+                            const sunAngle = this.getAngleFromPoint(x, y);
+                            if (sunAngle !== null) {
+                                this.handleInteraction(x, y, true);
                             } else {
-                                // Touched elsewhere - hide tooltips
-                                this.hideTooltips();
-                                this.draw();
+                                // Even if not exactly on arc, start dragging
+                                this.isDragging = true;
                             }
+                        } else {
+                            // Touched elsewhere (not sun, not prayer marker) - hide tooltips and don't move sun
+                            this.isDragging = false;
+                            this.hoveredAngle = null;
+                            this.hoveredArcPosition = null;
+                            this.hoveredPrayer = null;
+                            this.hideTooltips();
+                            this.draw();
                         }
                     });
                     
-                    // Mobile: Touch move - only update if dragging
+                    // Mobile: Touch move - only update if dragging sun
                     this.canvas.addEventListener('touchmove', (e) => {
                         e.preventDefault();
                         if (!this.isDragging) return; // Only move sun if actively dragging
@@ -636,7 +634,8 @@
                         const touch = e.touches[0];
                         const x = touch.clientX - rect.left;
                         const y = touch.clientY - rect.top;
-                        this.handleInteraction(x, y, true); // Pass isDragging flag
+                        // Continue dragging - follow touch position
+                        this.handleInteraction(x, y, true);
                     });
                     
                     // Mobile: Touch end - stop dragging and return sun to current time
@@ -698,6 +697,7 @@
                         }
                         return; // Don't move sun if not dragging
                     }
+                    
                     // Dragging the sun - get angle from position and move sun there
                     const angle = this.getAngleFromPoint(x, y);
                     
@@ -715,9 +715,40 @@
                         this.showTimeTooltip(angle, x, y);
                         this.draw(); // Redraw to show sun at dragged position
                     } else {
-                        // Not on arc - don't move sun but still allow dragging
-                        // (user might drag off the arc temporarily)
-                        this.draw(); // Keep current sun position
+                        // Not on arc - try to find closest point on arc
+                        // This allows dragging even if mouse goes slightly off the arc
+                        const centerX = this.canvas.width / 2;
+                        const centerY = this.canvas.height / 2;
+                        const isMobile = window.innerWidth < 768;
+                        const isLargeScreen = window.innerWidth > 1600;
+                        const radiusFactor = isMobile ? 0.38 : (isLargeScreen ? 0.42 : 0.48);
+                        const radius = Math.min(this.canvas.width * radiusFactor, this.canvas.height * radiusFactor);
+                        
+                        // Calculate angle from center to mouse position
+                        const dx = x - centerX;
+                        const dy = y - centerY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 0) {
+                            // Normalize and project onto circle
+                            const normalizedX = dx / distance;
+                            const normalizedY = dy / distance;
+                            const circleX = centerX + normalizedX * radius;
+                            const circleY = centerY + normalizedY * radius;
+                            
+                            // Get angle from this projected point
+                            const projectedAngle = this.getAngleFromPoint(circleX, circleY);
+                            if (projectedAngle !== null) {
+                                this.hoveredAngle = projectedAngle;
+                                this.isHovering = true;
+                                const pos = this.calculateArcPosition(projectedAngle);
+                                this.hoveredArcPosition = pos;
+                                this.hoveredMousePosition = { x: pos.x, y: pos.y };
+                                this.hoveredPrayer = null;
+                                this.showTimeTooltip(projectedAngle, x, y);
+                                this.draw();
+                            }
+                        }
                     }
                 }
                 
